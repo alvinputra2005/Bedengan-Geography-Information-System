@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-headline: "Manrope", sans-serif;
+
+    --color-primary: #0037b0;
+    --color-secondary: #006591;
+    --color-surface: #faf8ff;
+    --color-on-surface: #131b2e;
+    --color-on-surface-variant: #434655;
+    --color-surface-container: #eaedff;
+    --color-surface-container-low: #f2f3ff;
+    --color-surface-container-lowest: #ffffff;
+    --color-secondary-container: #39b8fd;
+    --color-error: #ba1a1a;
+}
+
+@layer base {
+    * {
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-surface text-on-surface font-sans antialiased;
+        min-width: 320px;
+        margin: 0;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+        font: inherit;
+    }
+
+    #app {
+        min-height: 100vh;
+    }
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #0037b0, #39b8fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0037b0, #1d4ed8);
+}
+
+.bg-gradient-organic {
+    background-color: var(--color-surface);
+    background-image:
+        radial-gradient(circle at 90% 100%, rgba(57, 184, 253, 0.1), transparent 50%),
+        radial-gradient(circle at 10% 40%, rgba(0, 55, 176, 0.04), transparent 50%);
+}
+
+.ambient-shadow {
+    box-shadow: 0 8px 48px rgba(0, 55, 176, 0.08);
+}
