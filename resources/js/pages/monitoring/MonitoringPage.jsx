@@ -1,12 +1,64 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import KPISection from './components/KPISection';
 import MonitoringChart from './components/MonitoringChart';
 import Sidebar from './components/Sidebar';
 import { getHealthStatus } from '../../services/systemService';
+import { subscribeToLatestSensor } from '../../services/monitoringService';
+
+const MAX_LOCAL_POINTS = 120;
+
+function formatRelativeUpdate(receivedAt) {
+    if (!receivedAt) {
+        return 'Menunggu data live dari sensor';
+    }
+
+    const diffMs = Date.now() - receivedAt;
+    const diffSeconds = Math.max(Math.round(diffMs / 1000), 0);
+
+    if (diffSeconds < 5) {
+        return 'Baru saja';
+    }
+
+    if (diffSeconds < 60) {
+        return `${diffSeconds} detik lalu`;
+    }
+
+    const diffMinutes = Math.round(diffSeconds / 60);
+    return `${diffMinutes} menit lalu`;
+}
+
+function formatReceivedTime(receivedAt) {
+    if (!receivedAt) {
+        return '-';
+    }
+
+    return new Intl.DateTimeFormat('id-ID', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    }).format(new Date(receivedAt));
+}
+
+function normalizeLatest(data, receivedAt) {
+    const jarakRaw = Number(data?.jarakCm ?? 0);
+
+    return {
+        deviceId: data?.deviceId ?? 'ews-bedengan-01',
+        jarakCm: Number.isFinite(jarakRaw) ? jarakRaw : 0,
+        status: data?.status ?? 'Menunggu data',
+        durationUs: Number(data?.durationUs ?? 0),
+        buzzer: Boolean(data?.buzzer ?? false),
+        deviceTimestamp: Number(data?.timestamp ?? 0), // tetap disimpan, tapi tidak dipakai untuk jam dashboard
+        receivedAt,
+    };
+}
 
 export default function MonitoringPage() {
     const [status, setStatus] = useState(null);
+    const [latestSensor, setLatestSensor] = useState(null);
+    const [sensorHistory, setSensorHistory] = useState([]);
+    const [sensorError, setSensorError] = useState('');
+    const lastPointKeyRef = useRef('');
 
     useEffect(() => {
         async function loadStatus() {
@@ -23,6 +75,61 @@ export default function MonitoringPage() {
 
         loadStatus();
     }, []);
+
+    useEffect(() => {
+        const unsubscribeLatest = subscribeToLatestSensor(
+            (data) => {
+                const receivedAt = Date.now();
+                const normalized = normalizeLatest(data, receivedAt);
+
+                setLatestSensor(normalized);
+                setSensorError('');
+
+                const pointKey = `${normalized.status}-${normalized.jarakCm}-${Math.floor(receivedAt / 1000)}`;
+                if (pointKey === lastPointKeyRef.current) {
+                    return;
+                }
+
+                lastPointKeyRef.current = pointKey;
+
+                setSensorHistory((prev) => {
+                    const nextPoint = {
+                        id: String(receivedAt),
+                        jarakCm: normalized.jarakCm > 0 ? normalized.jarakCm : 0,
+                        status: normalized.status,
+                        timestamp: receivedAt,
+                    };
+
+                    const next = [...prev, nextPoint];
+                    return next.slice(-MAX_LOCAL_POINTS);
+                });
+            },
+            () => setSensorError('Gagal membaca data sensor terbaru dari Firebase.')
+        );
+
+        return () => {
+            unsubscribeLatest();
+        };
+    }, []);
+
+    const sensorSummary = useMemo(() => {
+        const previous = sensorHistory.at(-2);
+        const current = sensorHistory.at(-1);
+        const deltaCm = current && previous ? current.jarakCm - previous.jarakCm : 0;
+
+        return {
+            deviceId: latestSensor?.deviceId ?? 'ews-bedengan-01',
+            jarakCm: Number(latestSensor?.jarakCm ?? 0),
+            durationUs: Number(latestSensor?.durationUs ?? 0),
+            buzzer: Boolean(latestSensor?.buzzer),
+            status: latestSensor?.status ?? 'Menunggu data',
+            timestamp: latestSensor?.receivedAt ?? 0,
+            formattedTimestamp: formatReceivedTime(latestSensor?.receivedAt ?? 0),
+            relativeUpdate: formatRelativeUpdate(latestSensor?.receivedAt ?? 0),
+            deltaCm,
+            historyCount: sensorHistory.length,
+        };
+    }, [latestSensor, sensorHistory]);
 
     return (
         <main className="min-h-screen px-4 pb-20 pt-32 font-sans md:px-8">
@@ -44,21 +151,21 @@ export default function MonitoringPage() {
                                 <span className="relative inline-flex h-3 w-3 rounded-full bg-secondary-container"></span>
                             </span>
                             <p className="text-xs font-bold uppercase tracking-wider text-on-surface/50">
-                                Update Terakhir: 10 Menit Lalu (Data Live)
+                                Update Terakhir: {sensorSummary.relativeUpdate} ({sensorSummary.formattedTimestamp})
                             </p>
                         </div>
 
                         <p className="max-w-3xl text-base font-medium leading-relaxed text-on-surface-variant md:text-lg">
-                            Pantau tinggi muka air, tren perubahan debit, dan insight operasional kawasan Bedengan
-                            dalam satu tampilan yang lebih siap dipakai untuk monitoring harian.
+                            Pantau pembacaan sensor ultrasonik Bedengan secara live dari Firebase Realtime Database,
+                            termasuk status siaga, histori pembacaan, dan respons buzzer dalam satu halaman.
                         </p>
                     </motion.header>
 
-                    <KPISection />
-                    <MonitoringChart />
+                    <KPISection summary={sensorSummary} />
+                    <MonitoringChart history={sensorHistory} />
                 </div>
 
-                <Sidebar status={status} />
+                <Sidebar status={status} sensorSummary={sensorSummary} sensorError={sensorError} />
             </div>
         </main>
     );

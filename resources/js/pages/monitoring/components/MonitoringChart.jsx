@@ -9,22 +9,21 @@ import {
     YAxis,
 } from 'recharts';
 
-const data = [
-    { time: '12:00', value: 1.1 },
-    { time: '14:00', value: 1.05 },
-    { time: '16:00', value: 1.2 },
-    { time: '18:00', value: 1.3 },
-    { time: '20:00', value: 1.0 },
-    { time: '22:00', value: 1.15 },
-    { time: '00:00', value: 1.12 },
-    { time: '02:00', value: 1.35 },
-    { time: '04:00', value: 1.2 },
-    { time: '06:00', value: 1.45 },
-    { time: '08:00', value: 1.35 },
-    { time: 'Sekarang', value: 1.55 },
-];
+function formatChartData(history) {
+    return history.map((item, index) => ({
+        time: new Intl.DateTimeFormat('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(new Date(item.timestamp)),
+        value: item.jarakCm,
+        status: item.status,
+        label: index === history.length - 1 ? 'Terbaru' : `Data ${index + 1}`,
+    }));
+}
 
-export default function MonitoringChart() {
+export default function MonitoringChart({ history }) {
+    const data = formatChartData(history);
+
     return (
         <motion.section
             initial={{ opacity: 0, scale: 0.98 }}
@@ -33,22 +32,24 @@ export default function MonitoringChart() {
             className="rounded-[2rem] border border-black/5 bg-white p-6 shadow-[0_4px_40px_rgba(19,27,46,0.06)]"
         >
             <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <h2 className="font-headline text-xl font-bold text-on-surface">Riwayat Muka Air 24 Jam</h2>
-
-                <div className="flex w-fit gap-1 rounded-full bg-surface-container-low p-1">
-                    <button className="rounded-full bg-white px-4 py-1 text-xs font-bold text-primary shadow-sm transition-all">
-                        24h
-                    </button>
-                    <button className="px-4 py-1 text-xs font-bold text-on-surface/40 transition-all hover:text-on-surface">
-                        7d
-                    </button>
-                    <button className="px-4 py-1 text-xs font-bold text-on-surface/40 transition-all hover:text-on-surface">
-                        30d
-                    </button>
+                <div>
+                    <h2 className="font-headline text-xl font-bold text-on-surface">Riwayat Pembacaan Sensor</h2>
+                    <p className="mt-2 text-sm font-medium text-on-surface-variant">
+                        Grafik ini menampilkan histori `sensor/history` yang sudah diurutkan berdasarkan timestamp.
+                    </p>
                 </div>
+
+                <span className="rounded-full bg-surface-container-low px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-on-surface/60">
+                    {data.length} data
+                </span>
             </div>
 
             <div className="h-[350px] w-full">
+                {data.length === 0 ? (
+                    <div className="flex h-full items-center justify-center rounded-3xl border border-dashed border-black/10 bg-surface-container-lowest px-6 text-center text-sm font-medium text-on-surface-variant">
+                        Belum ada riwayat sensor di Firebase pada path `sensor/history`.
+                    </div>
+                ) : (
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                         <defs>
@@ -82,6 +83,7 @@ export default function MonitoringChart() {
                                 fontFamily: 'Manrope, sans-serif',
                             }}
                             labelStyle={{ fontWeight: 700, marginBottom: '4px' }}
+                            formatter={(value, _name, item) => [`${value} cm`, item?.payload?.status ?? '-']}
                         />
                         <Area
                             type="monotone"
@@ -95,6 +97,7 @@ export default function MonitoringChart() {
                         />
                     </AreaChart>
                 </ResponsiveContainer>
+                )}
             </div>
         </motion.section>
     );

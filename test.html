@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Firebase Sensor</title>
+</head>
+<body>
+  <h1>Test Firebase</h1>
+
+  <button id="kirim">Kirim Data Dummy</button>
+
+  <p>Tinggi air: <span id="tinggi">-</span></p>
+  <p>Status: <span id="status">-</span></p>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBZCfYYpLe54Qj7Yx_Mio745B3HifpN_sY",
+        authDomain: "bedengan-gis.firebaseapp.com",
+        databaseURL: "https://bedengan-gis-default-rtdb.firebaseio.com",
+        projectId: "bedengan-gis",
+        storageBucket: "bedengan-gis.firebasestorage.app",
+        messagingSenderId: "1080746754923",
+        appId: "1:1080746754923:web:979b4dc8da9a1ff748c22e",
+        measurementId: "G-SR0MSBP6CG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const sensorRef = ref(db, "sensor/latest");
+
+    document.getElementById("kirim").addEventListener("click", async () => {
+      await set(sensorRef, {
+        tinggiAirCm: 27,
+        status: "Normal",
+        timestamp: Date.now()
+      });
+      alert("Data dummy terkirim");
+    });
+
+    onValue(sensorRef, (snapshot) => {
+      const data = snapshot.val();
+      document.getElementById("tinggi").textContent = data?.tinggiAirCm ?? "-";
+      document.getElementById("status").textContent = data?.status ?? "-";
+    });
+  </script>
+</body>
+</html>

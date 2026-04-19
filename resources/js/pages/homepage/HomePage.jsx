@@ -1,7 +1,5 @@
 import {
     Trees,
-    Activity,
-    Compass,
     Clock,
     Tent,
     ArrowRight,
@@ -114,16 +112,14 @@ export default function HomePage() {
                         <div className="flex flex-wrap items-center gap-5 md:gap-6">
                             <Link
                                 to="/monitoring"
-                                className="bg-primary text-white px-8 py-4 rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/30 transition-all flex items-center gap-3 group cursor-pointer"
+                                className="bg-primary text-white px-8 py-4 rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/30 transition-all cursor-pointer"
                             >
-                                <Activity size={18} />
                                 Lihat Monitoring
                             </Link>
                             <Link
                                 to="/map"
-                                className="bg-white text-on-surface px-8 py-4 rounded-2xl font-bold text-sm hover:bg-surface-container-low border border-black/5 shadow-sm transition-all flex items-center gap-3 group cursor-pointer"
+                                className="bg-white text-on-surface px-8 py-4 rounded-2xl font-bold text-sm hover:bg-surface-container-low border border-black/5 shadow-sm transition-all cursor-pointer"
                             >
-                                <Compass size={18} />
                                 Jelajahi Peta
                             </Link>
                         </div>
@@ -178,7 +174,7 @@ export default function HomePage() {
                         <motion.div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 relative" {...fadeUpItem}>
                             <motion.div
                                 whileHover={{ y: -5 }}
-                                className="bg-white rounded-3xl p-6 border border-black/5 shadow-sm hover:shadow-xl transition-all relative overflow-hidden group"
+                                className="bg-white rounded-3xl p-6 border border-black/5 shadow-xl shadow-slate-200/70 hover:shadow-2xl transition-all relative overflow-hidden flex flex-col justify-between group min-h-[300px]"
                             >
                                 <div className="absolute inset-x-0 bottom-0 h-1/2 opacity-10 pointer-events-none">
                                     <motion.div
@@ -198,55 +194,61 @@ export default function HomePage() {
                                     />
                                 </div>
 
-                                <div className="flex justify-between items-start mb-8 relative z-10">
+                                <div className="flex justify-between items-start relative z-10">
                                     <div className="flex items-center gap-2.5">
-                                        <div className="p-2 bg-primary/5 rounded-xl text-primary">
-                                            <Droplets size={18} />
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/5 text-primary">
+                                            <Droplets size={20} />
                                         </div>
-                                        <p className="text-xs text-on-surface-variant font-bold uppercase tracking-widest">
+                                        <p className="text-sm text-on-surface-variant font-bold uppercase tracking-[0.24em]">
                                             Status Air
                                         </p>
                                     </div>
                                     <motion.span
                                         animate={{ scale: [1, 1.05, 1] }}
                                         transition={{ duration: 2, repeat: Infinity }}
-                                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 text-green-600 font-bold text-[10px] uppercase tracking-wider relative overflow-hidden"
+                                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-green-500/10 text-green-600 font-bold text-xs uppercase tracking-wider relative overflow-hidden"
                                     >
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                                         Aman
                                     </motion.span>
                                 </div>
 
-                                <div className="relative z-10">
-                                    <div className="flex items-baseline gap-1">
-                                        <h3 className="font-headline font-black text-5xl text-on-surface tracking-tight">
+                                <div className="relative z-10 flex-1 flex flex-col justify-center py-8">
+                                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-[0.24em] mb-4">
+                                        Ketinggian Saat Ini
+                                    </p>
+                                    <div className="flex items-end gap-2">
+                                        <h3 className="font-headline font-black text-6xl text-on-surface tracking-tight leading-none">
                                             1.2
                                         </h3>
-                                        <span className="text-lg text-primary font-bold">m</span>
+                                        <span className="text-2xl text-primary font-bold leading-none pb-1">m</span>
                                     </div>
+                                    <p className="mt-4 max-w-[18rem] text-sm font-medium leading-relaxed text-on-surface-variant">
+                                        Level air masih dalam batas aman dan menunjukkan perubahan yang stabil.
+                                    </p>
+                                </div>
 
-                                    <div className="mt-4 p-3 bg-surface-container-low rounded-2xl flex items-center justify-between group-hover:bg-primary/5 transition-colors">
-                                        <p className="text-xs font-bold text-on-surface-variant flex items-center gap-2">
-                                            <ArrowRight className="-rotate-45 text-primary" size={14} />
-                                            Tren Naik Perlahan
-                                        </p>
-                                        <div className="flex gap-1">
-                                            {[1, 2, 3].map((i) => (
-                                                <motion.div
-                                                    key={i}
-                                                    animate={{ height: [4, 12, 4] }}
-                                                    transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                                                    className="w-1 bg-primary/20 rounded-full"
-                                                />
-                                            ))}
-                                        </div>
+                                <div className="relative z-10 p-4 bg-surface-container-low rounded-2xl flex items-center justify-between group-hover:bg-primary/5 transition-colors">
+                                    <p className="text-sm font-bold text-on-surface-variant flex items-center gap-2">
+                                        <ArrowRight className="-rotate-45 text-primary" size={15} />
+                                        Tren Naik Perlahan
+                                    </p>
+                                    <div className="flex gap-1.5">
+                                        {[1, 2, 3].map((i) => (
+                                            <motion.div
+                                                key={i}
+                                                animate={{ height: [6, 14, 6] }}
+                                                transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+                                                className="w-1.5 bg-primary/20 rounded-full"
+                                            />
+                                        ))}
                                     </div>
                                 </div>
                             </motion.div>
 
                             <motion.div
                                 whileHover={{ y: -5 }}
-                                className="bg-primary rounded-3xl p-6 shadow-xl shadow-primary/20 relative overflow-hidden flex flex-col justify-between group"
+                                className="bg-primary rounded-3xl p-6 shadow-xl shadow-primary/20 relative overflow-hidden flex flex-col justify-between group min-h-[300px]"
                             >
                                 <div
                                     className="absolute inset-0 opacity-10"
@@ -256,7 +258,7 @@ export default function HomePage() {
                                         backgroundSize: '20px 20px',
                                     }}
                                 ></div>
-                                <div className="relative z-10">
+                                <div className="relative z-10 flex-1 flex flex-col">
                                     <div className="flex items-center gap-2 mb-4">
                                         <Tent className="text-white bg-white/10 p-2 rounded-xl" size={36} />
                                         <p className="text-xs text-white font-bold uppercase tracking-wide">
@@ -267,6 +269,30 @@ export default function HomePage() {
                                     <p className="text-sm font-medium text-white/80">
                                         Jarak teraman dari bibir sungai dengan kondisi tanah stabil.
                                     </p>
+
+                                    <div className="mt-6 grid grid-cols-2 gap-3">
+                                        <div className="rounded-2xl bg-white/10 px-4 py-3 backdrop-blur-sm border border-white/10">
+                                            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/60">
+                                                Status
+                                            </p>
+                                            <p className="mt-2 text-lg font-black text-white">Aman</p>
+                                        </div>
+                                        <div className="rounded-2xl bg-white/10 px-4 py-3 backdrop-blur-sm border border-white/10">
+                                            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/60">
+                                                Kontur
+                                            </p>
+                                            <p className="mt-2 text-lg font-black text-white">Stabil</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-4 flex flex-wrap gap-2">
+                                        <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-white/85 border border-white/10">
+                                            Jauh dari bibir sungai
+                                        </span>
+                                        <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-white/85 border border-white/10">
+                                            Cocok untuk tenda keluarga
+                                        </span>
+                                    </div>
                                 </div>
                                 <button className="relative z-10 mt-6 flex items-center justify-between w-full bg-white/10 hover:bg-white/20 px-4 py-3 rounded-xl transition-colors text-white font-bold text-sm backdrop-blur-sm cursor-pointer">
                                     <span>Lihat Peta Ground</span>
@@ -319,10 +345,9 @@ export default function HomePage() {
                         {...fadeUpItem}
                     >
                         <img
-                            src="https://picsum.photos/seed/river-mist/800/600"
-                            alt="Bedengan River"
+                            src="/images/Camping-Bumi-Perkemahan-Bedengan.webp"
+                            alt="Camping Bumi Perkemahan Bedengan"
                             className="w-full h-full object-cover"
-                            referrerPolicy="no-referrer"
                         />
                         <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"></div>
                     </motion.div>
@@ -335,32 +360,21 @@ export default function HomePage() {
                     {...staggerContainer}
                 >
                     <motion.div
-                        className="relative aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl order-1"
+                        className="relative aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl order-1 lg:max-w-[48rem]"
                         {...fadeUpItem}
                     >
                         <img
-                            src="https://picsum.photos/seed/pines/800/600"
-                            alt="Pine Forest"
-                            className="w-full h-full object-cover"
-                            referrerPolicy="no-referrer"
+                            src="/images/Hutan-Pohon-Pinus.jpg"
+                            alt="Hutan Pohon Pinus Bedengan"
+                            className="w-full h-full object-cover object-center"
                         />
-                        <div className="absolute left-8 bottom-8 glass-panel p-8 rounded-3xl max-w-xs shadow-xl hidden md:block border border-black/10">
-                            <p className="font-headline font-bold text-lg text-on-surface-variant">
-                                &quot;Merawat kelestarian di setiap hela nafas alam.&quot;
-                            </p>
-                        </div>
                     </motion.div>
-                    <motion.div className="order-2 px-6" {...fadeUpItem}>
-                        <h2 className="font-headline text-3xl md:text-4xl lg:text-[2.75rem] font-extrabold text-on-surface leading-tight mb-6">
+                    <motion.div className="order-2 lg:px-6 max-w-2xl self-center" {...fadeUpItem}>
+                        <h2 className="font-headline text-3xl md:text-4xl lg:text-[2.65rem] font-extrabold text-on-surface leading-[1.08] tracking-tight mb-6">
                             Harmoni Hutan Pinus & <br />
                             <span className="text-primary">Aliran Sungai Jernih</span>
                         </h2>
-                        <div className="space-y-5 mb-10 text-on-surface-variant font-medium leading-relaxed text-base md:text-lg">
-                            <p>
-                                Wisata Alam Bedengan menyajikan lanskap ekologis yang memadukan rimbunnya hutan pinus
-                                (Pinus merkusii) dengan kesegaran aliran sungai yang bersumber langsung dari
-                                pegunungan.
-                            </p>
+                        <div className="space-y-5 mb-10 text-on-surface-variant font-medium leading-relaxed text-base md:text-lg max-w-xl">
                             <p>
                                 Berada di area perhutani yang dikelola secara berkelanjutan, Bedengan menawarkan ruang
                                 bagi pengunjung untuk terhubung kembali dengan alam sembari memastikan kelestarian
@@ -384,102 +398,6 @@ export default function HomePage() {
                                     Sungai berbatu dengan air sebening kristal.
                                 </p>
                             </div>
-                        </div>
-                    </motion.div>
-                </motion.div>
-            </motion.section>
-
-            <motion.section
-                className="relative overflow-hidden py-16 md:py-20 lg:py-24 px-6 md:px-12 lg:px-20 bg-transparent"
-                id="daya-tarik"
-                {...sectionReveal}
-            >
-                <motion.div className="max-w-[1920px] mx-auto" {...staggerContainer}>
-                    <motion.div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8" {...fadeUpItem}>
-                        <div className="max-w-2xl">
-                            <h2 className="font-headline text-4xl lg:text-5xl font-extrabold text-on-surface mb-4">
-                                Daya Tarik & Fasilitas
-                            </h2>
-                            <p className="text-on-surface-variant font-medium text-lg">
-                                Menjelajahi beragam sudut menarik yang ditawarkan oleh kawasan konservasi dan wisata
-                                Bedengan.
-                            </p>
-                        </div>
-                        <Link
-                            to="/map"
-                            className="bg-white text-on-surface px-6 py-3 rounded-2xl font-bold text-sm hover:bg-surface border border-black/5 transition-colors flex items-center gap-2 ambient-shadow group cursor-pointer"
-                        >
-                            Lihat Peta Lengkap{' '}
-                            <ArrowRight className="group-hover:translate-x-1 transition-transform" size={16} />
-                        </Link>
-                    </motion.div>
-
-                    <motion.div className="grid grid-cols-1 md:grid-cols-12 gap-6" {...fadeUpItem}>
-                        <motion.div
-                            whileHover={{ y: -4 }}
-                            className="md:col-span-8 relative group overflow-hidden h-[500px] rounded-3xl border border-black/5"
-                        >
-                            <img
-                                src="https://picsum.photos/seed/camping-bedengan/1200/800"
-                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                                alt="Camping"
-                                referrerPolicy="no-referrer"
-                            />
-                            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors"></div>
-                            <div className="absolute bottom-0 left-0 p-10 w-full">
-                                <span className="inline-block py-1 px-3 mb-4 border border-white/40 text-white text-xs font-bold tracking-widest uppercase bg-black/20 backdrop-blur-sm rounded-full">
-                                    Area Utama
-                                </span>
-                                <h3 className="font-headline text-3xl md:text-4xl font-extrabold text-white mb-3">
-                                    Camping Ground Ekologis
-                                </h3>
-                                <p className="text-white/90 max-w-xl font-medium leading-relaxed">
-                                    Area berkemah luas di bawah naungan pohon pinus yang rindang, dilengkapi fasilitas
-                                    dasar namun tetap mempertahankan suasana alam liar yang autentik.
-                                </p>
-                            </div>
-                        </motion.div>
-                        <div className="md:col-span-4 flex flex-col gap-6">
-                            <motion.div
-                                whileHover={{ y: -4 }}
-                                className="relative group overflow-hidden h-[238px] rounded-3xl border border-black/5"
-                            >
-                                <img
-                                    src="https://picsum.photos/seed/river-stones/600/400"
-                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                                    alt="River"
-                                    referrerPolicy="no-referrer"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                                <div className="absolute bottom-0 left-0 p-6 w-full">
-                                    <h3 className="font-headline text-2xl font-extrabold text-white mb-2">
-                                        Sungai Jernih
-                                    </h3>
-                                    <p className="text-sm text-white/90 font-medium">
-                                        Aliran sungai dangkal yang aman untuk aktivitas bermain air ringan.
-                                    </p>
-                                </div>
-                            </motion.div>
-                            <motion.div
-                                whileHover={{ y: -4 }}
-                                className="relative group overflow-hidden h-[238px] rounded-3xl border border-black/5"
-                            >
-                                <img
-                                    src="https://picsum.photos/seed/trekking-path/600/400"
-                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                                    alt="Trekking"
-                                    referrerPolicy="no-referrer"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                                <div className="absolute bottom-0 left-0 p-6 w-full">
-                                    <h3 className="font-headline text-2xl font-extrabold text-white mb-2">
-                                        Jalur Trekking
-                                    </h3>
-                                    <p className="text-sm text-white/90 font-medium">
-                                        Rute pejalan kaki menyusuri tepi sungai dan menembus kelebatan hutan pinus.
-                                    </p>
-                                </div>
-                            </motion.div>
                         </div>
                     </motion.div>
                 </motion.div>
