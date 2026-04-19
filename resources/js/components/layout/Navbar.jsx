@@ -1,4 +1,4 @@
-import { Trees, Menu, X } from 'lucide-react';
+import { CircleUserRound, Shield, Trees, Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -85,11 +85,18 @@ export default function Navbar() {
                     <div className="hidden md:flex items-center flex-shrink-0">
                         {isAuthenticated ? (
                             <div className="flex items-center gap-3">
-                                <div className="text-right">
-                                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-on-surface-variant">
-                                        Login sebagai
-                                    </p>
-                                    <p className="text-sm font-bold text-on-surface">{user?.name}</p>
+                                <div className="flex items-center gap-2.5 rounded-full border border-black/5 bg-white/90 pl-2.5 pr-4 py-2 shadow-sm">
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                        {isAdmin ? <Shield size={16} /> : <CircleUserRound size={16} />}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-on-surface-variant/80">
+                                            Login sebagai
+                                        </p>
+                                        <p className="max-w-[9rem] truncate text-[13px] font-bold leading-tight text-on-surface">
+                                            {user?.name}
+                                        </p>
+                                    </div>
                                 </div>
                                 {isAdmin ? (
                                     <Link
@@ -158,6 +165,17 @@ export default function Navbar() {
 
                             {isAuthenticated ? (
                                 <>
+                                    <div className="mb-1 flex items-center gap-3 rounded-2xl border border-black/5 bg-surface-container-low px-4 py-3">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                            {isAdmin ? <Shield size={17} /> : <CircleUserRound size={17} />}
+                                        </div>
+                                        <div>
+                                            <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-on-surface-variant/80">
+                                                Login sebagai
+                                            </p>
+                                            <p className="text-sm font-bold leading-tight text-on-surface">{user?.name}</p>
+                                        </div>
+                                    </div>
                                     {isAdmin ? (
                                         <Link
                                             to={workspaceRoute}

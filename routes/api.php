@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Api\AdminDashboardController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BedenganController;
 use App\Http\Controllers\Api\HealthController;
+use App\Http\Controllers\Api\RouteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,4 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'show']);
     Route::get('/user', [AuthController::class, 'show']);
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'show'])->middleware('role:admin');
+    Route::get('/bedengans', [BedenganController::class, 'index']);
+    Route::get('/bedengans/{bedengan}', [BedenganController::class, 'show']);
+    Route::get('/route', [RouteController::class, 'show']);
 });
