@@ -1,5 +1,6 @@
 import {
     AlertTriangle,
+    ChevronRight,
     LayoutDashboard,
     LogOut,
     Map as MapIcon,
@@ -9,37 +10,34 @@ import {
     Trees,
 } from 'lucide-react';
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
 const adminNavItems = [
-    { icon: LayoutDashboard, label: 'Ringkasan', to: '/admin' },
-    { icon: Radio, label: 'Monitoring', to: '/monitoring' },
-    { icon: Trees, label: 'Data Camping', to: '/admin' },
-    { icon: MapIcon, label: 'Peta Spasial', to: '/map' },
-    { icon: AlertTriangle, label: 'Laporan Mitigasi', to: '/mitigation' },
-    { icon: Settings, label: 'Pengaturan', to: '/admin' },
+    { icon: LayoutDashboard, label: 'Dashboard', to: '/admin' },
+    { icon: Trees, label: 'Data Camping', to: '/admin/camping' },
+    { icon: MapIcon, label: 'Peta Spasial', to: '/admin/map' },
+    { icon: AlertTriangle, label: 'Laporan Mitigasi', to: '/admin/mitigation' },
 ];
 
 function NavItem({ icon: Icon, label, to }) {
+    const location = useLocation();
+    const isActive = location.pathname === to;
+
     return (
         <NavLink
             to={to}
-            end={to === '/admin'}
-            className={({ isActive }) =>
+            end
+            className={
                 `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-300 ease-in-out ${
                     isActive
                         ? 'bg-white text-primary font-bold shadow-sm'
-                        : 'text-on-surface opacity-60 hover:bg-white/50 font-medium'
+                        : 'font-medium text-on-surface opacity-60 hover:bg-white/50'
                 }`
             }
         >
-            {({ isActive }) => (
-                <>
-                    <Icon size={20} className={isActive ? 'text-primary' : ''} />
-                    {label}
-                </>
-            )}
+            <Icon size={20} className={isActive ? 'text-primary' : ''} />
+            <span className="flex-1">{label}</span>
         </NavLink>
     );
 }
@@ -88,18 +86,12 @@ export default function AdminSidebar() {
                 {logoutError ? (
                     <p className="rounded-xl bg-red-50 px-3 py-2 text-xs font-medium text-red-600">{logoutError}</p>
                 ) : null}
-                <button
-                    type="button"
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary-container px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(29,78,216,0.39)] transition-opacity hover:opacity-90"
-                >
-                    <Plus size={18} />
-                    Tambah Data Baru
-                </button>
+               
                 <button
                     type="button"
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-error opacity-80 transition-all hover:bg-error-container hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary-container px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(29,78,216,0.39)] transition-opacity hover:opacity-90"
                 >
                     <LogOut size={20} />
                     {isLoggingOut ? 'Keluar...' : 'Logout'}

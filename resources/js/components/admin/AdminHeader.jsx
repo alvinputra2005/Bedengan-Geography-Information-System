@@ -1,16 +1,17 @@
 import { Bell } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 
-export default function AdminHeader() {
+export default function AdminHeader({
+    title = 'Kelola Sensor GIS',
+    subtitle = 'Monitoring perangkat IoT area Bedengan.',
+}) {
     const { user } = useAuth();
 
     return (
         <header className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-                <h1 className="font-headline text-3xl font-extrabold tracking-tight text-on-surface">
-                    Kelola Sensor GIS
-                </h1>
-                <p className="mt-1 text-sm text-on-surface-variant">Monitoring perangkat IoT area Bedengan.</p>
+                <h1 className="font-headline text-3xl font-extrabold tracking-tight text-on-surface">{title}</h1>
+                <p className="mt-1 text-sm text-on-surface-variant">{subtitle}</p>
             </div>
 
             <div className="flex items-center gap-4 self-start md:self-auto">

@@ -4,6 +4,7 @@ import AuthLayout from '../layouts/AuthLayout';
 import MainLayout from '../layouts/MainLayout';
 import RegisterPage from '../pages/auth/RegisterPage';
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
+import AdminPlaceholderPage from '../pages/admin/AdminPlaceholderPage';
 import LoginPage from '../pages/auth/LoginPage';
 import HomePage from '../pages/homepage/HomePage';
 import MapPage from '../pages/map/MapPage';
@@ -79,6 +80,56 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <AdminDashboardPage />,
+            },
+            {
+                path: 'monitoring',
+                element: (
+                    <AdminPlaceholderPage
+                        title="Monitoring Sensor"
+                        subtitle="Pantau kualitas data dan status perangkat langsung dari panel admin."
+                        description="Bagian ini disiapkan untuk kontrol data monitoring, validasi pembacaan sensor, dan tindak lanjut gangguan perangkat."
+                    />
+                ),
+            },
+            {
+                path: 'camping',
+                element: (
+                    <AdminPlaceholderPage
+                        title="Data Camping"
+                        subtitle="Kelola informasi area camping dan atribut wisata Bedengan."
+                        description="Halaman ini menjadi titik kerja admin untuk memperbarui data lokasi, fasilitas, kapasitas, dan status operasional area camping."
+                    />
+                ),
+            },
+            {
+                path: 'map',
+                element: (
+                    <AdminPlaceholderPage
+                        title="Peta Spasial"
+                        subtitle="Atur lapisan peta, titik lokasi, dan data geospasial kawasan."
+                        description="Ruang ini disiapkan untuk manajemen layer GIS, validasi koordinat, dan pembaruan visualisasi peta untuk kebutuhan admin."
+                    />
+                ),
+            },
+            {
+                path: 'mitigation',
+                element: (
+                    <AdminPlaceholderPage
+                        title="Laporan Mitigasi"
+                        subtitle="Kelola laporan insiden dan alur tindak lanjut mitigasi risiko."
+                        description="Halaman ini nantinya dipakai untuk meninjau laporan masuk, mengurutkan prioritas, dan mendokumentasikan tindakan mitigasi."
+                    />
+                ),
+            },
+            {
+                path: 'settings',
+                element: (
+                    <AdminPlaceholderPage
+                        title="Pengaturan"
+                        subtitle="Atur preferensi panel admin dan parameter sistem operasional."
+                        description="Bagian ini disiapkan untuk konfigurasi hak akses, preferensi notifikasi, dan pengaturan inti dashboard admin."
+                    />
+                ),
             },
         ],
     },
