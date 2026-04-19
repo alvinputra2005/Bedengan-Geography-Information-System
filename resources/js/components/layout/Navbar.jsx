@@ -8,7 +8,6 @@ const navigationItems = [
     { label: 'Monitoring', to: '/monitoring' },
     { label: 'Peta Interaktif', to: '/map' },
     { label: 'Mitigasi', to: '/mitigation' },
-    { label: 'Dashboard', to: '/dashboard' },
 ];
 
 function NavItem({ to, children }) {
