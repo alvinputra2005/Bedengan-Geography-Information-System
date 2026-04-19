@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
-import { login, logout, me } from '../services/authService';
+import { login, logout, me, register } from '../services/authService';
+import { getUserRole } from '../utils/auth';
 
 export const AuthContext = createContext(null);
 
@@ -38,19 +39,31 @@ export function AuthProvider({ children }) {
         return response;
     }
 
+    async function signUp(payload) {
+        const response = await register(payload);
+        setUser(response.user);
+        return response;
+    }
+
     async function signOut() {
         await logout();
         setUser(null);
     }
 
+    const role = getUserRole(user);
+
     return (
         <AuthContext.Provider
             value={{
                 user,
+                role,
+                isAdmin: role === 'admin',
+                isUser: role === 'user',
                 isAuthenticated: Boolean(user),
                 isBootstrapping,
                 refreshUser,
                 signIn,
+                signUp,
                 signOut,
             }}
         >

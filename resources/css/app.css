@@ -6,15 +6,23 @@
     --font-headline: "Manrope", sans-serif;
 
     --color-primary: #0037b0;
+    --color-primary-container: #1d4ed8;
+    --color-primary-fixed: #dbeafe;
     --color-secondary: #006591;
     --color-surface: #faf8ff;
     --color-on-surface: #131b2e;
     --color-on-surface-variant: #434655;
     --color-surface-container: #eaedff;
     --color-surface-container-low: #f2f3ff;
+    --color-surface-container-high: #dde4ff;
     --color-surface-container-lowest: #ffffff;
     --color-secondary-container: #39b8fd;
     --color-error: #ba1a1a;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #410002;
+    --color-on-secondary-container: #00344a;
+    --color-outline: #7b8194;
+    --color-outline-variant: #c4c7d6;
 }
 
 @layer base {

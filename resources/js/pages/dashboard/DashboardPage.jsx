@@ -1,5 +1,24 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getDashboardData } from '../../services/systemService';
+
+const quickLinks = [
+    {
+        title: 'Monitoring Live',
+        description: 'Lihat pembacaan sensor terbaru dan histori perubahan air.',
+        to: '/monitoring',
+    },
+    {
+        title: 'Peta Interaktif',
+        description: 'Buka area jalur evakuasi, zona aman, dan lokasi strategis.',
+        to: '/map',
+    },
+    {
+        title: 'Mitigasi Risiko',
+        description: 'Akses SOP lapangan, prioritas respon, dan checklist evakuasi.',
+        to: '/mitigation',
+    },
+];
 
 export default function DashboardPage() {
     const [data, setData] = useState(null);
@@ -22,12 +41,12 @@ export default function DashboardPage() {
     }, []);
 
     return (
-        <main className="max-w-[1440px] mx-auto px-6 md:px-12 pt-32 pb-20">
+        <section className="space-y-8">
             <div className="mb-8">
-                <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary mb-3">Protected Route</p>
-                <h1 className="font-headline text-4xl md:text-5xl font-extrabold text-on-surface">Dashboard Operator</h1>
+                <p className="mb-3 text-xs font-bold uppercase tracking-[0.24em] text-primary">Portal Pengguna</p>
+                <h1 className="font-headline text-4xl font-extrabold text-on-surface md:text-5xl">Dashboard Pengguna</h1>
                 <p className="mt-3 max-w-2xl text-on-surface-variant font-medium">
-                    Halaman ini hanya bisa diakses setelah login, sehingga cocok untuk panel internal monitoring.
+                    Setelah login, user masuk ke area private yang terpisah dari beranda publik. Semua menu utama ada di sidebar pengguna.
                 </p>
             </div>
 
@@ -52,6 +71,19 @@ export default function DashboardPage() {
                     </article>
                 </section>
             ) : null}
-        </main>
+
+            <section className="grid gap-5 md:grid-cols-3">
+                {quickLinks.map((item) => (
+                    <Link
+                        key={item.to}
+                        to={item.to}
+                        className="rounded-[2rem] border border-black/5 bg-white p-6 shadow-sm transition-transform hover:-translate-y-1"
+                    >
+                        <h2 className="font-headline text-xl font-bold text-on-surface">{item.title}</h2>
+                        <p className="mt-3 text-sm font-medium leading-relaxed text-on-surface-variant">{item.description}</p>
+                    </Link>
+                ))}
+            </section>
+        </section>
     );
 }

@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { getDefaultPrivateRoute, hasRequiredRole } from '../utils/auth';
 
 function FullPageMessage({ message }) {
     return (
@@ -11,9 +12,9 @@ function FullPageMessage({ message }) {
     );
 }
 
-export function RequireAuth({ children }) {
+export function RequireAuth({ children, roles = [] }) {
     const location = useLocation();
-    const { isAuthenticated, isBootstrapping } = useAuth();
+    const { isAuthenticated, isBootstrapping, user } = useAuth();
 
     if (isBootstrapping) {
         return <FullPageMessage message="Memeriksa sesi login..." />;
@@ -23,18 +24,22 @@ export function RequireAuth({ children }) {
         return <Navigate to="/login" replace state={{ from: location }} />;
     }
 
+    if (roles.length > 0 && !hasRequiredRole(user, roles)) {
+        return <Navigate to={getDefaultPrivateRoute(user)} replace />;
+    }
+
     return children;
 }
 
 export function GuestOnly({ children }) {
-    const { isAuthenticated, isBootstrapping } = useAuth();
+    const { isAuthenticated, isBootstrapping, user } = useAuth();
 
     if (isBootstrapping) {
         return <FullPageMessage message="Menyiapkan halaman..." />;
     }
 
     if (isAuthenticated) {
-        return <Navigate to="/dashboard" replace />;
+        return <Navigate to={getDefaultPrivateRoute(user)} replace />;
     }
 
     return children;

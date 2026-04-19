@@ -2,13 +2,13 @@ import { Trees, Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { getDefaultPrivateRoute } from '../../utils/auth';
 
 const navigationItems = [
     { label: 'Beranda', to: '/' },
     { label: 'Monitoring', to: '/monitoring' },
     { label: 'Peta Interaktif', to: '/map' },
     { label: 'Mitigasi', to: '/mitigation' },
-    { label: 'Dashboard', to: '/dashboard' },
 ];
 
 function NavItem({ to, children }) {
@@ -35,6 +35,7 @@ export default function Navbar() {
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const navigate = useNavigate();
     const { user, isAuthenticated, signOut } = useAuth();
+    const workspaceRoute = getDefaultPrivateRoute(user);
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -92,6 +93,12 @@ export default function Navbar() {
                                     </p>
                                     <p className="text-sm font-bold text-on-surface">{user?.name}</p>
                                 </div>
+                                <Link
+                                    to={workspaceRoute}
+                                    className="rounded-full border border-primary/15 px-5 py-3 text-sm font-bold text-primary transition-colors hover:bg-primary/5"
+                                >
+                                    Buka Panel
+                                </Link>
                                 <button
                                     type="button"
                                     onClick={handleLogout}
@@ -144,22 +151,40 @@ export default function Navbar() {
                             ))}
 
                             {isAuthenticated ? (
-                                <button
-                                    type="button"
-                                    onClick={handleLogout}
-                                    disabled={isLoggingOut}
-                                    className="px-4 py-3 rounded-2xl text-sm font-semibold tracking-wide text-left bg-primary text-white disabled:opacity-70"
-                                >
-                                    {isLoggingOut ? 'Keluar...' : 'Logout'}
-                                </button>
+                                <>
+                                    <Link
+                                        to={workspaceRoute}
+                                        onClick={() => setMenuOpen(false)}
+                                        className="px-4 py-3 rounded-2xl text-sm font-semibold tracking-wide bg-primary/10 text-primary"
+                                    >
+                                        Buka Panel
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        onClick={handleLogout}
+                                        disabled={isLoggingOut}
+                                        className="px-4 py-3 rounded-2xl text-sm font-semibold tracking-wide text-left bg-primary text-white disabled:opacity-70"
+                                    >
+                                        {isLoggingOut ? 'Keluar...' : 'Logout'}
+                                    </button>
+                                </>
                             ) : (
-                                <Link
-                                    to="/login"
-                                    onClick={() => setMenuOpen(false)}
-                                    className="px-4 py-3 rounded-2xl text-sm font-semibold tracking-wide bg-primary text-white"
-                                >
-                                    Login
-                                </Link>
+                                <div className="grid gap-2">
+                                    <Link
+                                        to="/login"
+                                        onClick={() => setMenuOpen(false)}
+                                        className="px-4 py-3 rounded-2xl text-sm font-semibold tracking-wide bg-primary text-white"
+                                    >
+                                        Login
+                                    </Link>
+                                    <Link
+                                        to="/register"
+                                        onClick={() => setMenuOpen(false)}
+                                        className="px-4 py-3 rounded-2xl text-sm font-semibold tracking-wide border border-black/10 text-on-surface"
+                                    >
+                                        Sign Up
+                                    </Link>
+                                </div>
                             )}
                         </div>
                     </div>

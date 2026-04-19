@@ -132,7 +132,7 @@ export default function MonitoringPage() {
     }, [latestSensor, sensorHistory]);
 
     return (
-        <main className="min-h-screen px-4 pb-20 pt-32 font-sans md:px-8">
+        <section className="font-sans">
             <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 lg:flex-row">
                 <div className="flex flex-1 flex-col gap-8">
                     <motion.header
@@ -167,6 +167,6 @@ export default function MonitoringPage() {
 
                 <Sidebar status={status} sensorSummary={sensorSummary} sensorError={sensorError} />
             </div>
-        </main>
+        </section>
     );
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { getDefaultPrivateRoute } from '../../utils/auth';
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -20,8 +21,8 @@ export default function LoginPage() {
         setIsSubmitting(true);
 
         try {
-            await signIn(form);
-            const destination = location.state?.from?.pathname || '/dashboard';
+            const response = await signIn(form);
+            const destination = location.state?.from?.pathname || getDefaultPrivateRoute(response.user);
             navigate(destination, { replace: true });
         } catch (requestError) {
             setError(requestError.response?.data?.message || requestError.response?.data?.errors?.email?.[0] || 'Login gagal.');
@@ -43,7 +44,7 @@ export default function LoginPage() {
         <main className="min-h-screen px-6 md:px-12 pt-32 pb-16 flex items-center justify-center">
             <div className="w-full max-w-md rounded-[2rem] border border-black/5 bg-white p-8 shadow-xl shadow-black/5">
                 <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary mb-4">Autentikasi</p>
-                <h1 className="font-headline text-4xl font-extrabold text-on-surface mb-3">Masuk ke panel</h1>
+                <h1 className="font-headline text-4xl font-extrabold text-on-surface mb-3">Login</h1>
                 <p className="text-sm text-on-surface-variant font-medium mb-8">
                     Gunakan session login Laravel agar React dan backend tetap sinkron di satu domain.
                 </p>
@@ -93,14 +94,14 @@ export default function LoginPage() {
                     </button>
                 </form>
 
-                <div className="mt-8 rounded-2xl bg-surface-container-low px-4 py-4 text-sm text-on-surface-variant">
-                    Endpoint auth yang dipakai: <code className="font-bold">/sanctum/csrf-cookie</code> dan{' '}
-                    <code className="font-bold">/api/auth/login</code>.
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+                    <Link to="/register" className="inline-flex text-sm font-semibold text-primary hover:underline">
+                        Belum punya akun? Sign Up
+                    </Link>
+                    <Link to="/" className="inline-flex text-sm font-semibold text-on-surface-variant hover:text-primary">
+                        Kembali ke beranda
+                    </Link>
                 </div>
-
-                <Link to="/" className="mt-6 inline-flex text-sm font-semibold text-primary hover:underline">
-                    Kembali ke beranda
-                </Link>
             </div>
         </main>
     );
