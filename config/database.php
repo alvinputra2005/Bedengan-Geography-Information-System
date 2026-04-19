@@ -15,7 +15,10 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env(
+        'DB_CONNECTION',
+        Str::startsWith((string) env('DATABASE_URL'), ['postgres://', 'postgresql://']) ? 'pgsql' : 'mysql'
+    ),
 
     /*
     |--------------------------------------------------------------------------

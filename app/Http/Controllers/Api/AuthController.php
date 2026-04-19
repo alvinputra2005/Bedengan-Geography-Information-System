@@ -17,24 +17,31 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (! Auth::attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password'],
+            'is_active' => true,
+        ])) {
             throw ValidationException::withMessages([
                 'email' => ['Email atau password tidak valid.'],
             ]);
         }
 
         $request->session()->regenerate();
+        $request->user()->forceFill([
+            'last_login_at' => now(),
+        ])->save();
 
         return response()->json([
             'message' => 'Login berhasil.',
-            'user' => $request->user(),
+            'user' => $request->user()->load('role:id,name'),
         ]);
     }
 
     public function show(Request $request): JsonResponse
     {
         return response()->json([
-            'user' => $request->user(),
+            'user' => $request->user()?->load('role:id,name'),
         ]);
     }
 
