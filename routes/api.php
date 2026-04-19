@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Api\AdminDashboardController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\HealthController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +27,5 @@ Route::prefix('auth')->middleware('web')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'show']);
     Route::get('/user', [AuthController::class, 'show']);
-    Route::get('/dashboard', [DashboardController::class, 'show']);
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'show'])->middleware('role:admin');
 });

@@ -2,16 +2,13 @@ import { createBrowserRouter } from 'react-router-dom';
 import AdminLayout from '../layouts/AdminLayout';
 import AuthLayout from '../layouts/AuthLayout';
 import MainLayout from '../layouts/MainLayout';
-import UserLayout from '../layouts/UserLayout';
 import RegisterPage from '../pages/auth/RegisterPage';
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
 import LoginPage from '../pages/auth/LoginPage';
-import DashboardPage from '../pages/dashboard/DashboardPage';
 import HomePage from '../pages/homepage/HomePage';
 import MapPage from '../pages/map/MapPage';
 import MitigationPage from '../pages/mitigation/MitigationPage';
 import MonitoringPage from '../pages/monitoring/MonitoringPage';
-import AccountPage from '../pages/account/AccountPage';
 import NotFoundPage from '../pages/system/NotFoundPage';
 import { GuestOnly, RequireAuth } from './guards';
 
@@ -23,6 +20,30 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <HomePage />,
+            },
+            {
+                path: 'monitoring',
+                element: (
+                    <RequireAuth roles={['user', 'admin']}>
+                        <MonitoringPage />
+                    </RequireAuth>
+                ),
+            },
+            {
+                path: 'map',
+                element: (
+                    <RequireAuth roles={['user', 'admin']}>
+                        <MapPage />
+                    </RequireAuth>
+                ),
+            },
+            {
+                path: 'mitigation',
+                element: (
+                    <RequireAuth roles={['user', 'admin']}>
+                        <MitigationPage />
+                    </RequireAuth>
+                ),
             },
         ],
     },
@@ -44,35 +65,6 @@ export const router = createBrowserRouter([
                         <RegisterPage />
                     </GuestOnly>
                 ),
-            },
-        ],
-    },
-    {
-        element: (
-            <RequireAuth roles={['user', 'admin']}>
-                <UserLayout />
-            </RequireAuth>
-        ),
-        children: [
-            {
-                path: '/dashboard',
-                element: <DashboardPage />,
-            },
-            {
-                path: '/monitoring',
-                element: <MonitoringPage />,
-            },
-            {
-                path: '/map',
-                element: <MapPage />,
-            },
-            {
-                path: '/mitigation',
-                element: <MitigationPage />,
-            },
-            {
-                path: '/account',
-                element: <AccountPage />,
             },
         ],
     },

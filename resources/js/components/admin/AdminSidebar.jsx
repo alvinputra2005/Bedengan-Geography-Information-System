@@ -14,10 +14,10 @@ import { useAuth } from '../../hooks/useAuth';
 const adminNavItems = [
     { icon: LayoutDashboard, label: 'Ringkasan', to: '/admin' },
     { icon: Radio, label: 'Monitoring', to: '/monitoring' },
-    { icon: Trees, label: 'Data Camping', to: '/dashboard' },
+    { icon: Trees, label: 'Data Camping', to: '/admin' },
     { icon: MapIcon, label: 'Peta Spasial', to: '/map' },
     { icon: AlertTriangle, label: 'Laporan Mitigasi', to: '/mitigation' },
-    { icon: Settings, label: 'Pengaturan', to: '/account' },
+    { icon: Settings, label: 'Pengaturan', to: '/admin' },
 ];
 
 function NavItem({ icon: Icon, label, to }) {

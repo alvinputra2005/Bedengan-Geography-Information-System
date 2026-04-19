@@ -34,7 +34,7 @@ export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const navigate = useNavigate();
-    const { user, isAuthenticated, signOut } = useAuth();
+    const { user, isAuthenticated, isAdmin, signOut } = useAuth();
     const workspaceRoute = getDefaultPrivateRoute(user);
 
     useEffect(() => {
@@ -93,12 +93,14 @@ export default function Navbar() {
                                     </p>
                                     <p className="text-sm font-bold text-on-surface">{user?.name}</p>
                                 </div>
-                                <Link
-                                    to={workspaceRoute}
-                                    className="rounded-full border border-primary/15 px-5 py-3 text-sm font-bold text-primary transition-colors hover:bg-primary/5"
-                                >
-                                    Buka Panel
-                                </Link>
+                                {isAdmin ? (
+                                    <Link
+                                        to={workspaceRoute}
+                                        className="rounded-full border border-primary/15 px-5 py-3 text-sm font-bold text-primary transition-colors hover:bg-primary/5"
+                                    >
+                                        Buka Panel
+                                    </Link>
+                                ) : null}
                                 <button
                                     type="button"
                                     onClick={handleLogout}
@@ -152,13 +154,15 @@ export default function Navbar() {
 
                             {isAuthenticated ? (
                                 <>
-                                    <Link
-                                        to={workspaceRoute}
-                                        onClick={() => setMenuOpen(false)}
-                                        className="px-4 py-3 rounded-2xl text-sm font-semibold tracking-wide bg-primary/10 text-primary"
-                                    >
-                                        Buka Panel
-                                    </Link>
+                                    {isAdmin ? (
+                                        <Link
+                                            to={workspaceRoute}
+                                            onClick={() => setMenuOpen(false)}
+                                            className="px-4 py-3 rounded-2xl text-sm font-semibold tracking-wide bg-primary/10 text-primary"
+                                        >
+                                            Buka Panel
+                                        </Link>
+                                    ) : null}
                                     <button
                                         type="button"
                                         onClick={handleLogout}

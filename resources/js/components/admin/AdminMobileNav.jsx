@@ -1,4 +1,4 @@
-import { LayoutDashboard, Map as MapIcon, Radio, ShieldAlert, UserCircle2 } from 'lucide-react';
+import { LayoutDashboard, Map as MapIcon, Radio, ShieldAlert, Trees } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 const items = [
@@ -6,7 +6,7 @@ const items = [
     { label: 'Monitoring', to: '/monitoring', icon: Radio },
     { label: 'Peta', to: '/map', icon: MapIcon },
     { label: 'Mitigasi', to: '/mitigation', icon: ShieldAlert },
-    { label: 'Akun', to: '/account', icon: UserCircle2 },
+    { label: 'Camping', to: '/admin', icon: Trees },
 ];
 
 export default function AdminMobileNav() {

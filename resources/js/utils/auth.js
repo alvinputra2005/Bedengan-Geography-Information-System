@@ -15,5 +15,5 @@ export function hasRequiredRole(user, roles = []) {
 }
 
 export function getDefaultPrivateRoute(user) {
-    return getUserRole(user) === 'admin' ? '/admin' : '/dashboard';
+    return getUserRole(user) === 'admin' ? '/admin' : '/';
 }
