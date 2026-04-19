@@ -1,43 +1,68 @@
 import { Gauge, Radio, TrendingUp, Waves } from 'lucide-react';
 import { motion } from 'motion/react';
 
-const kpiData = [
-    {
-        icon: Waves,
-        label: 'Tinggi Muka Air',
-        value: '1.2',
-        unit: 'm',
-        status: 'Aman',
+function getStatusStyles(status) {
+    const normalizedStatus = (status || '').toUpperCase();
+
+    if (normalizedStatus === 'BAHAYA') {
+        return {
+            color: 'text-red-600',
+            badge: 'bg-red-50 text-red-600',
+        };
+    }
+
+    if (normalizedStatus === 'WASPADA') {
+        return {
+            color: 'text-amber-600',
+            badge: 'bg-amber-50 text-amber-600',
+        };
+    }
+
+    return {
         color: 'text-primary',
         badge: 'bg-secondary-container/20 text-primary',
-    },
-    {
-        icon: Radio,
-        label: 'Jarak Sensor',
-        value: '2.8',
-        unit: 'm',
-        status: null,
-        color: 'text-secondary',
-    },
-    {
-        icon: TrendingUp,
-        label: 'Laju Kenaikan',
-        value: '+0.1',
-        unit: 'm/jam',
-        status: null,
-        color: 'text-secondary-container',
-    },
-    {
-        icon: Gauge,
-        label: 'Debit Air',
-        value: 'Normal',
-        unit: '',
-        status: null,
-        color: 'text-primary',
-    },
-];
+    };
+}
 
-export default function KPISection() {
+export default function KPISection({ summary }) {
+    const statusStyles = getStatusStyles(summary.status);
+    const deltaPrefix = summary.deltaCm > 0 ? '+' : '';
+    const kpiData = [
+        {
+            icon: Waves,
+            label: 'Jarak Permukaan Air',
+            value: summary.jarakCm || '-',
+            unit: 'cm',
+            status: summary.status,
+            color: statusStyles.color,
+            badge: statusStyles.badge,
+        },
+        {
+            icon: Radio,
+            label: 'Perangkat Sensor',
+            value: summary.deviceId,
+            unit: '',
+            status: null,
+            color: 'text-secondary',
+        },
+        {
+            icon: TrendingUp,
+            label: 'Perubahan Terakhir',
+            value: `${deltaPrefix}${summary.deltaCm}`,
+            unit: 'cm',
+            status: null,
+            color: 'text-secondary-container',
+        },
+        {
+            icon: Gauge,
+            label: 'Durasi Ping',
+            value: summary.durationUs || '-',
+            unit: 'us',
+            status: null,
+            color: 'text-primary',
+        },
+    ];
+
     return (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {kpiData.map((item, index) => (
@@ -59,7 +84,7 @@ export default function KPISection() {
                         <p className="mb-1 font-headline text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/50">
                             {item.label}
                         </p>
-                        <p className="font-headline text-3xl font-bold text-on-surface">
+                        <p className="break-words font-headline text-3xl font-bold text-on-surface">
                             {item.value}{' '}
                             {item.unit ? <span className="text-lg font-medium text-on-surface/40">{item.unit}</span> : null}
                         </p>
