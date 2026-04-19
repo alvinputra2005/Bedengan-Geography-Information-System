@@ -6,6 +6,7 @@ import RegisterPage from '../pages/auth/RegisterPage';
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
 import AdminPlaceholderPage from '../pages/admin/AdminPlaceholderPage';
 import LoginPage from '../pages/auth/LoginPage';
+import CampingGroundPage from '../pages/camping-ground/CampingGroundPage';
 import HomePage from '../pages/homepage/HomePage';
 import MapPage from '../pages/map/MapPage';
 import MitigationPage from '../pages/mitigation/MitigationPage';
@@ -21,6 +22,10 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <HomePage />,
+            },
+            {
+                path: 'camping-ground',
+                element: <CampingGroundPage />,
             },
             {
                 path: 'monitoring',

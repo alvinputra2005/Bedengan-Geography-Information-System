@@ -5,9 +5,7 @@
     --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
     --font-headline: "Manrope", sans-serif;
 
-    --color-primary: #0037b0;
-    --color-primary-container: #1d4ed8;
-    --color-primary-fixed: #dbeafe;
+    --color-primary: #026692;
     --color-secondary: #006591;
     --color-surface: #faf8ff;
     --color-on-surface: #131b2e;
@@ -65,22 +63,25 @@
 }
 
 .text-gradient {
-    background: linear-gradient(135deg, #0037b0, #39b8fd);
+    background: linear-gradient(135deg, #026692, #39b8fd);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .bg-gradient-primary {
-    background: linear-gradient(135deg, #0037b0, #1d4ed8);
+    background: linear-gradient(135deg, #026692, #39b8fd);
 }
 
 .bg-gradient-organic {
     background-color: var(--color-surface);
     background-image:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 12%, rgba(250, 248, 255, 0.86) 24%, rgba(250, 248, 255, 1) 40%),
         radial-gradient(circle at 90% 100%, rgba(57, 184, 253, 0.1), transparent 50%),
-        radial-gradient(circle at 10% 40%, rgba(0, 55, 176, 0.04), transparent 50%);
+        radial-gradient(circle at 10% 40%, rgba(2, 102, 146, 0.08), transparent 50%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%, 100% 100%, 100% 100%;
 }
 
 .ambient-shadow {
-    box-shadow: 0 8px 48px rgba(0, 55, 176, 0.08);
+    box-shadow: 0 8px 48px rgba(2, 102, 146, 0.12);
 }
