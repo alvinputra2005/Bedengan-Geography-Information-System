@@ -6,7 +6,7 @@ function KpiCard({ icon: Icon, label, value, helperText }) {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl border border-outline-variant/10 bg-surface-container-lowest p-5"
+            className="h-full rounded-2xl border border-outline-variant/10 bg-surface-container-lowest p-5"
         >
             <div className="mb-4 flex items-start justify-between">
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-fixed/30 text-primary">
@@ -48,7 +48,7 @@ export default function AdminKpiSection({ summary }) {
     ];
 
     return (
-        <section className="mb-6 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <section className="mb-6 grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 xl:[grid-template-columns:repeat(3,minmax(0,1fr))]">
             {cards.map((card) => (
                 <KpiCard key={card.label} {...card} />
             ))}

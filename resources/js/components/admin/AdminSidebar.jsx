@@ -91,7 +91,7 @@ export default function AdminSidebar() {
                     type="button"
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary-container px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(29,78,216,0.39)] transition-opacity hover:opacity-90"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-secondary px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(29,78,216,0.39)] transition-opacity hover:opacity-90"
                 >
                     <LogOut size={20} />
                     {isLoggingOut ? 'Keluar...' : 'Logout'}

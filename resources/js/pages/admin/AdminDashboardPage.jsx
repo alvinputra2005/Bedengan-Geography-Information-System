@@ -139,7 +139,7 @@ export default function AdminDashboardPage() {
     }, [chartHistory, data, latestSensor, sensorHistory.length]);
 
     return (
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col">
             <AdminHeader
                 title="Dashboard Monitoring Sensor"
             />
@@ -149,16 +149,16 @@ export default function AdminDashboardPage() {
                 <>
                     <AdminKpiSection summary={data.summary} />
 
-                    <div className="mb-6 grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
+                    <div className="mb-6 grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
                         <AdminMonitoringOverview monitoring={monitoringSummary} sensorError={sensorError} />
                         <AdminSensorChart history={chartHistory} sensorName={monitoringSummary.sensorName} />
                     </div>
 
-                    <div className="grid flex-1 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.85fr)]">
-                        <div>
+                    <div className="grid min-w-0 flex-1 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.85fr)]">
+                        <div className="min-w-0">
                             <AdminSensorTable sensors={data.sensors} />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                             <AdminNotificationPanel notifications={data.notifications} />
                         </div>
                     </div>
