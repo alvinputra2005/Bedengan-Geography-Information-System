@@ -1,4 +1,4 @@
-import { ShieldCheck, TriangleAlert } from 'lucide-react';
+import { BellRing, CloudUpload, ShieldCheck, TriangleAlert } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 
@@ -32,18 +32,22 @@ const guidanceSteps = [
     {
         id: '2',
         title: '2. Waspada',
-        dotColor: 'bg-amber-500',
+        dotColor: 'bg-yellow-500',
         description:
             'Cuaca mulai berubah. Kurangi aktivitas di area bantaran sungai dan siapkan perlengkapan darurat agar mudah dijangkau.',
-        cardClassName: 'bg-white border border-black/5',
+        cardClassName: 'bg-yellow-50 border border-yellow-200',
+        titleClassName: 'text-yellow-800',
+        descriptionClassName: 'text-yellow-900/80',
     },
     {
         id: '3',
         title: '3. Siaga',
-        dotColor: 'bg-orange-500',
+        dotColor: 'bg-orange-600',
         description:
             'Potensi bahaya terdeteksi. Ikuti arahan petugas, amankan barang penting, dan bersiap menuju jalur evakuasi yang ditetapkan.',
-        cardClassName: 'bg-white border border-black/5',
+        cardClassName: 'bg-orange-50 border border-orange-200',
+        titleClassName: 'text-orange-800',
+        descriptionClassName: 'text-orange-900/80',
     },
     {
         id: '4',
@@ -243,6 +247,123 @@ export default function MitigationPage() {
                                 </p>
                             </div>
                         ))}
+                    </motion.div>
+                </div>
+            </section>
+
+            <section className="px-6 pt-16 md:px-12 md:pt-20 lg:px-20">
+                <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+                    <motion.div
+                        initial={{ opacity: 0, y: 24 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.2 }}
+                        transition={{ duration: 0.6 }}
+                        className="ambient-shadow rounded-[2rem] border border-black/5 bg-white p-8 md:p-10"
+                    >
+                        <SectionHeader
+                            eyebrow="Pelaporan Cepat"
+                            title="Laporkan insiden secara ringkas dan terarah"
+                            description="Gunakan formulir ini untuk membantu petugas menerima informasi awal secara lebih cepat saat terjadi kejadian di area wisata."
+                        />
+
+                        <div className="mt-8 space-y-3">
+                            <div className="rounded-2xl bg-surface-container-low px-4 py-3">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-on-surface/50">
+                                    Kapan digunakan
+                                </p>
+                                <p className="mt-2 text-sm font-medium leading-relaxed text-on-surface-variant">
+                                    Saat ada kejadian seperti debit air naik cepat, pengunjung cedera, longsor kecil,
+                                    kehilangan arah, atau kerusakan fasilitas penting.
+                                </p>
+                            </div>
+                            <div className="rounded-2xl bg-surface-container-low px-4 py-3">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-on-surface/50">
+                                    Tips isi laporan
+                                </p>
+                                <p className="mt-2 text-sm font-medium leading-relaxed text-on-surface-variant">
+                                    Tulis lokasi sejelas mungkin, jelaskan kondisi inti dengan singkat, dan unggah foto
+                                    jika tersedia agar respons lapangan lebih tepat.
+                                </p>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 24 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.15 }}
+                        transition={{ duration: 0.7, delay: 0.05 }}
+                        className="ambient-shadow rounded-[2rem] border border-black/5 bg-white p-6 md:p-8"
+                    >
+                        <div className="flex items-center gap-3 text-primary">
+                            <div className="rounded-2xl bg-primary/10 p-3">
+                                <BellRing size={22} />
+                            </div>
+                            <h3 className="font-headline text-2xl font-extrabold text-on-surface">Lapor Insiden</h3>
+                        </div>
+
+                        <form className="mt-6 space-y-5">
+                            <div>
+                                <label className="mb-2 block text-sm font-bold text-on-surface" htmlFor="reporter-name">
+                                    Nama Pelapor
+                                </label>
+                                <input
+                                    id="reporter-name"
+                                    type="text"
+                                    placeholder="Masukkan nama Anda"
+                                    className="w-full rounded-2xl border border-black/5 bg-surface-container-low px-4 py-3 text-sm font-medium text-on-surface outline-none transition-colors placeholder:text-on-surface/40 focus:border-primary/30"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-bold text-on-surface" htmlFor="incident-location">
+                                    Lokasi Kejadian
+                                </label>
+                                <select
+                                    id="incident-location"
+                                    defaultValue=""
+                                    className="w-full rounded-2xl border border-black/5 bg-surface-container-low px-4 py-3 text-sm font-medium text-on-surface outline-none transition-colors focus:border-primary/30"
+                                >
+                                    <option value="" disabled>
+                                        Pilih area...
+                                    </option>
+                                    <option>Ground A</option>
+                                    <option>Ground B</option>
+                                    <option>Ground C</option>
+                                    <option>Area Sungai</option>
+                                    <option>Jalur Masuk</option>
+                                    <option>Pos Jaga</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-bold text-on-surface" htmlFor="incident-description">
+                                    Deskripsi Insiden
+                                </label>
+                                <textarea
+                                    id="incident-description"
+                                    rows={4}
+                                    placeholder="Jelaskan apa yang terjadi..."
+                                    className="w-full rounded-2xl border border-black/5 bg-surface-container-low px-4 py-3 text-sm font-medium text-on-surface outline-none transition-colors placeholder:text-on-surface/40 focus:border-primary/30"
+                                ></textarea>
+                            </div>
+
+                            <div>
+                                <p className="mb-2 block text-sm font-bold text-on-surface">Bukti Foto (Opsional)</p>
+                                <label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-primary/20 bg-surface-container-low px-6 py-8 text-center transition-colors hover:border-primary/35 hover:bg-primary/5">
+                                    <CloudUpload className="text-on-surface/45" size={28} />
+                                    <span className="text-sm font-medium text-on-surface-variant">Klik untuk unggah foto</span>
+                                    <input type="file" className="hidden" />
+                                </label>
+                            </div>
+
+                            <button
+                                type="button"
+                                className="w-full rounded-2xl bg-gradient-primary px-5 py-3.5 text-sm font-bold text-white transition-all hover:shadow-xl hover:shadow-primary/20"
+                            >
+                                Kirim Laporan
+                            </button>
+                        </form>
                     </motion.div>
                 </div>
             </section>

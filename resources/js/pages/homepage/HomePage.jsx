@@ -1,13 +1,9 @@
 import {
     Trees,
     Clock,
-    Tent,
     ArrowRight,
     Leaf,
     Droplets,
-    Trash2,
-    Flame,
-    VolumeX,
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
@@ -34,26 +30,30 @@ const fadeUpItem = {
 
 const guideItems = [
     {
-        icon: Trash2,
         title: 'Kelola Sampah Mandiri',
+        image: '/images/two-perrson-sorting-garbage-concept-recycling-zero-waste.jpg',
+        imagePosition: 'center',
         description:
             'Bawa kantong sampah sendiri dan pastikan tidak meninggalkan jejak apa pun di area wisata. Konservasi dimulai dari diri sendiri.',
     },
     {
-        icon: Flame,
         title: 'Aturan Api Unggun',
+        image: '/images/night-campfire-night.jpg',
+        imagePosition: 'center',
         description:
             'Nyalakan api unggun hanya di area yang telah disediakan. Pastikan api benar-benar padam sebelum meninggalkan lokasi.',
     },
     {
-        icon: VolumeX,
         title: 'Hargai Ketenangan',
+        image: '/images/winter-camping-landscape-with-tent.jpg',
+        imagePosition: 'center',
         description:
             'Jaga tingkat kebisingan seminimal mungkin, terutama di malam hari. Hormati alam dan pengunjung lain yang mencari ketenangan.',
     },
     {
-        icon: Droplets,
         title: 'Jaga Kualitas Air',
+        image: '/images/beautiful-view-river-flowing-through-forest.jpg',
+        imagePosition: 'center',
         description:
             'Dilarang membuang sabun, deterjen, atau limbah ke dalam aliran sungai. Gunakan fasilitas kebersihan yang telah disediakan.',
     },
@@ -63,7 +63,7 @@ export default function HomePage() {
     return (
         <main className="pb-20">
             <motion.section
-                className="relative w-full px-6 pb-28 pt-28 md:px-12 md:pb-32 md:pt-32 lg:px-20 lg:pb-36 lg:pt-36 overflow-hidden mb-12 md:mb-16 lg:mb-20 min-h-[780px] md:min-h-[860px] lg:min-h-[920px] flex items-center"
+                className="relative w-full px-6 pb-24 pt-28 md:px-12 md:pb-28 md:pt-32 lg:px-20 lg:pb-32 lg:pt-36 overflow-hidden mb-8 md:mb-10 lg:mb-12 min-h-[780px] md:min-h-[860px] lg:min-h-[920px] flex items-center"
                 id="beranda"
                 {...sectionReveal}
             >
@@ -91,14 +91,6 @@ export default function HomePage() {
                         transition={{ duration: 0.8 }}
                         className="text-left max-w-2xl"
                     >
-                        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-primary/5 border border-primary/10 text-primary font-bold text-xs uppercase tracking-wider mb-8">
-                            <span className="relative flex h-2 w-2">
-                                <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-75 animate-ping"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                            </span>
-                            Live Monitoring System
-                        </div>
-
                         <h1 className="font-headline font-extrabold text-5xl md:text-6xl lg:text-7xl text-on-surface tracking-tighter leading-[1] mb-8">
                             Wisata Alam <br />
                             <span className="text-primary block mt-2">Bedengan</span>
@@ -162,7 +154,7 @@ export default function HomePage() {
                                 Pantauan otomatis dari sensor IoT di sepanjang aliran sungai Bedengan untuk memastikan
                                 keamanan pengunjung.
                             </p>
-                            <div className="flex items-center gap-4 bg-surface-container-low p-4 rounded-2xl border border-black/5">
+                            <div className="flex items-center gap-4 rounded-2xl border border-[rgba(2,102,146,0.12)] bg-[rgba(2,102,146,0.08)] p-4">
                                 <Clock className="text-primary" size={32} />
                                 <div>
                                     <p className="text-xs font-bold text-on-surface-variant uppercase">Update Terakhir</p>
@@ -174,7 +166,7 @@ export default function HomePage() {
                         <motion.div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 relative" {...fadeUpItem}>
                             <motion.div
                                 whileHover={{ y: -5 }}
-                                className="bg-white rounded-3xl p-6 border border-black/5 shadow-xl shadow-slate-200/70 hover:shadow-2xl transition-all relative overflow-hidden flex flex-col justify-between group min-h-[300px]"
+                                className="bg-white rounded-3xl p-6 border border-black/5 shadow-xl shadow-slate-200/70 hover:shadow-2xl transition-all relative overflow-hidden flex flex-col justify-between group min-h-[260px]"
                             >
                                 <div className="absolute inset-x-0 bottom-0 h-1/2 opacity-10 pointer-events-none">
                                     <motion.div
@@ -194,29 +186,13 @@ export default function HomePage() {
                                     />
                                 </div>
 
-                                <div className="flex justify-between items-start relative z-10">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/5 text-primary">
-                                            <Droplets size={20} />
-                                        </div>
-                                        <p className="text-sm text-on-surface-variant font-bold uppercase tracking-[0.24em]">
-                                            Status Air
-                                        </p>
-                                    </div>
-                                    <motion.span
-                                        animate={{ scale: [1, 1.05, 1] }}
-                                        transition={{ duration: 2, repeat: Infinity }}
-                                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-green-500/10 text-green-600 font-bold text-xs uppercase tracking-wider relative overflow-hidden"
-                                    >
-                                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                        Aman
-                                    </motion.span>
+                                <div className="relative z-10">
+                                    <p className="text-sm text-on-surface-variant font-bold uppercase tracking-[0.24em]">
+                                        Status Air
+                                    </p>
                                 </div>
 
-                                <div className="relative z-10 flex-1 flex flex-col justify-center py-8">
-                                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-[0.24em] mb-4">
-                                        Ketinggian Saat Ini
-                                    </p>
+                                <div className="relative z-10 flex-1 flex flex-col justify-center py-3">
                                     <div className="flex items-end gap-2">
                                         <h3 className="font-headline font-black text-6xl text-on-surface tracking-tight leading-none">
                                             1.2
@@ -248,7 +224,7 @@ export default function HomePage() {
 
                             <motion.div
                                 whileHover={{ y: -5 }}
-                                className="bg-primary rounded-3xl p-6 shadow-xl shadow-primary/20 relative overflow-hidden flex flex-col justify-between group min-h-[300px]"
+                                className="bg-primary rounded-3xl p-6 shadow-xl shadow-primary/20 relative overflow-hidden flex flex-col justify-between group min-h-[260px]"
                             >
                                 <div
                                     className="absolute inset-0 opacity-10"
@@ -259,16 +235,12 @@ export default function HomePage() {
                                     }}
                                 ></div>
                                 <div className="relative z-10 flex-1 flex flex-col">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <Tent className="text-white bg-white/10 p-2 rounded-xl" size={36} />
+                                    <div className="mb-4">
                                         <p className="text-xs text-white font-bold uppercase tracking-wide">
                                             Rekomendasi Ground
                                         </p>
                                     </div>
                                     <h3 className="font-headline font-black text-3xl text-white mb-2">Ground A & C</h3>
-                                    <p className="text-sm font-medium text-white/80">
-                                        Jarak teraman dari bibir sungai dengan kondisi tanah stabil.
-                                    </p>
 
                                     <div className="mt-6 grid grid-cols-2 gap-3">
                                         <div className="rounded-2xl bg-white/10 px-4 py-3 backdrop-blur-sm border border-white/10">
@@ -284,17 +256,8 @@ export default function HomePage() {
                                             <p className="mt-2 text-lg font-black text-white">Stabil</p>
                                         </div>
                                     </div>
-
-                                    <div className="mt-4 flex flex-wrap gap-2">
-                                        <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-white/85 border border-white/10">
-                                            Jauh dari bibir sungai
-                                        </span>
-                                        <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-white/85 border border-white/10">
-                                            Cocok untuk tenda keluarga
-                                        </span>
-                                    </div>
                                 </div>
-                                <button className="relative z-10 mt-6 flex items-center justify-between w-full bg-white/10 hover:bg-white/20 px-4 py-3 rounded-xl transition-colors text-white font-bold text-sm backdrop-blur-sm cursor-pointer">
+                                <button className="relative z-10 mt-5 flex items-center justify-between w-full bg-white/10 hover:bg-white/20 px-4 py-3 rounded-xl transition-colors text-white font-bold text-sm backdrop-blur-sm cursor-pointer">
                                     <span>Lihat Peta Ground</span>
                                     <ArrowRight className="group-hover:translate-x-1 transition-transform" size={16} />
                                 </button>
@@ -410,39 +373,53 @@ export default function HomePage() {
             >
                 <motion.div className="max-w-[1920px] mx-auto flex flex-col lg:flex-row gap-12" {...staggerContainer}>
                     <motion.div className="lg:w-1/3" {...fadeUpItem}>
-                        <div className="lg:sticky lg:top-32 bg-white p-8 md:p-10 rounded-[2rem] border border-black/5 ambient-shadow">
-                            <span className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-6 flex items-center gap-4 before:content-[''] before:w-8 before:h-px before:bg-primary">
-                                Perhatian
-                            </span>
-                            <h2 className="font-headline text-4xl lg:text-5xl font-extrabold text-on-surface mb-6 leading-tight">
-                                Panduan <br />
-                                <span className="text-primary">Keselamatan</span> <br />& Etika
-                            </h2>
-                            <p className="text-on-surface-variant font-medium leading-relaxed text-sm">
-                                Untuk menjaga kelestarian kawasan dan kenyamanan bersama, pengunjung diwajibkan mematuhi
-                                panduan ekologis Bedengan.
-                            </p>
+                        <div className="lg:sticky lg:top-32 rounded-[2rem] border border-black/5 shadow-[0_20px_55px_rgba(15,23,42,0.1),0_8px_24px_rgba(15,23,42,0.06)] overflow-hidden relative">
+                            <div
+                                className="absolute inset-0 bg-cover bg-center scale-105"
+                                style={{ backgroundImage: "url('/images/Foto-Icon-Bedengan.jpeg')" }}
+                            ></div>
+                            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.92)_0%,rgba(255,255,255,0.88)_45%,rgba(255,255,255,0.94)_100%)]"></div>
+                            <div className="absolute inset-0 bg-primary/[0.03]"></div>
+                            <div className="relative py-8 pl-7 pr-8 md:py-10 md:pl-8 md:pr-10">
+                                <span className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-6 flex items-center gap-4 before:content-[''] before:w-8 before:h-px before:bg-primary">
+                                    Perhatian
+                                </span>
+                                <h2 className="font-headline text-4xl lg:text-5xl font-extrabold text-on-surface mb-6 leading-tight">
+                                    Panduan <br />
+                                    <span className="text-primary">Keselamatan</span> <br />& Etika
+                                </h2>
+                                <p className="text-on-surface-variant font-medium leading-relaxed text-sm">
+                                    Untuk menjaga kelestarian kawasan dan kenyamanan bersama, pengunjung diwajibkan mematuhi
+                                    panduan ekologis Bedengan.
+                                </p>
+                            </div>
                         </div>
                     </motion.div>
 
                     <motion.div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-5" {...fadeUpItem}>
                         {guideItems.map((item) => {
-                            const Icon = item.icon;
-
                             return (
                                 <motion.div
                                     key={item.title}
                                     whileHover={{ y: -4 }}
-                                    className="bg-white rounded-[2rem] p-6 border border-black/5 relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow"
+                                    className="bg-white rounded-[2rem] px-6 py-7 border border-black/5 relative overflow-hidden group shadow-[0_18px_45px_rgba(15,23,42,0.08),0_6px_18px_rgba(15,23,42,0.05)] hover:shadow-[0_24px_60px_rgba(15,23,42,0.12),0_10px_26px_rgba(15,23,42,0.07)] transition-shadow"
                                 >
-                                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-transparent"></div>
-                                    <Icon className="text-primary mb-5 bg-primary/5 p-3 rounded-xl box-content" size={24} />
-                                    <h4 className="font-headline font-bold text-on-surface mb-2 text-lg tracking-wide group-hover:text-primary transition-colors">
-                                        {item.title}
-                                    </h4>
-                                    <p className="text-on-surface-variant font-medium leading-relaxed text-xs">
-                                        {item.description}
-                                    </p>
+                                    <img
+                                        src={item.image}
+                                        alt=""
+                                        aria-hidden="true"
+                                        className="absolute inset-0 h-full w-full object-cover opacity-[0.4] scale-105 transition duration-300 group-hover:scale-[1.08] group-hover:opacity-[0.46]"
+                                        style={{ objectPosition: item.imagePosition }}
+                                    />
+                                    <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.8)_40%,rgba(255,255,255,0.54)_68%,rgba(255,255,255,0.62)_100%)]"></div>
+                                    <div className="relative">
+                                        <h4 className="font-headline font-bold text-primary mb-3 text-lg tracking-wide">
+                                            {item.title}
+                                        </h4>
+                                        <p className="text-on-surface-variant font-medium leading-relaxed text-sm">
+                                            {item.description}
+                                        </p>
+                                    </div>
                                 </motion.div>
                             );
                         })}

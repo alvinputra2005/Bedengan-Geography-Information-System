@@ -2,13 +2,7 @@ import { Trees, Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-
-const navigationItems = [
-    { label: 'Beranda', to: '/' },
-    { label: 'Monitoring', to: '/monitoring' },
-    { label: 'Peta Interaktif', to: '/map' },
-    { label: 'Mitigasi', to: '/mitigation' },
-];
+import { publicNavigationItems } from './navigation';
 
 function NavItem({ to, children }) {
     return (
@@ -75,7 +69,7 @@ export default function Navbar() {
                     </Link>
 
                     <div className="hidden lg:flex items-center font-headline font-semibold text-sm tracking-wide bg-surface-container-lowest/30 p-1.5 rounded-full border border-black/5 mx-8">
-                        {navigationItems.map((item) => (
+                        {publicNavigationItems.map((item) => (
                             <NavItem key={item.label} to={item.to}>
                                 {item.label}
                             </NavItem>
@@ -124,7 +118,7 @@ export default function Navbar() {
                 {menuOpen && (
                     <div className="lg:hidden px-6 md:px-12 pb-4">
                         <div className="max-w-[1440px] mx-auto bg-white/95 backdrop-blur-xl rounded-3xl border border-black/5 shadow-lg p-4 flex flex-col gap-2">
-                            {navigationItems.map((item) => (
+                            {publicNavigationItems.map((item) => (
                                 <NavLink
                                     key={item.label}
                                     to={item.to}

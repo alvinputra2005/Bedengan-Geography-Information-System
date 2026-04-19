@@ -54,8 +54,8 @@ export default function MonitoringChart({ history }) {
                     <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                         <defs>
                             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#0037b0" stopOpacity={0.2} />
-                                <stop offset="95%" stopColor="#0037b0" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#026692" stopOpacity={0.24} />
+                                <stop offset="95%" stopColor="#026692" stopOpacity={0} />
                             </linearGradient>
                         </defs>
 
@@ -88,12 +88,12 @@ export default function MonitoringChart({ history }) {
                         <Area
                             type="monotone"
                             dataKey="value"
-                            stroke="#0037b0"
+                            stroke="#026692"
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorValue)"
-                            dot={{ r: 4, fill: '#0037b0', strokeWidth: 2, stroke: '#fff' }}
-                            activeDot={{ r: 6, fill: '#0037b0', strokeWidth: 2, stroke: '#fff' }}
+                            dot={{ r: 4, fill: '#026692', strokeWidth: 2, stroke: '#fff' }}
+                            activeDot={{ r: 6, fill: '#026692', strokeWidth: 2, stroke: '#fff' }}
                         />
                     </AreaChart>
                 </ResponsiveContainer>

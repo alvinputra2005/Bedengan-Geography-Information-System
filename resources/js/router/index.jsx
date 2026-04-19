@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import LoginPage from '../pages/auth/LoginPage';
+import CampingGroundPage from '../pages/camping-ground/CampingGroundPage';
 import DashboardPage from '../pages/dashboard/DashboardPage';
 import HomePage from '../pages/homepage/HomePage';
 import MapPage from '../pages/map/MapPage';
@@ -17,6 +18,10 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <HomePage />,
+            },
+            {
+                path: 'camping-ground',
+                element: <CampingGroundPage />,
             },
             {
                 path: 'monitoring',
