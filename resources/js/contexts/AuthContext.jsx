@@ -46,8 +46,17 @@ export function AuthProvider({ children }) {
     }
 
     async function signOut() {
-        await logout();
-        setUser(null);
+        try {
+            await logout();
+        } catch (error) {
+            const status = error.response?.status;
+
+            if (status !== 401 && status !== 419) {
+                throw error;
+            }
+        } finally {
+            setUser(null);
+        }
     }
 
     const role = getUserRole(user);

@@ -8,6 +8,7 @@ import {
     Settings,
     Trees,
 } from 'lucide-react';
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -45,11 +46,22 @@ function NavItem({ icon: Icon, label, to }) {
 
 export default function AdminSidebar() {
     const navigate = useNavigate();
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [logoutError, setLogoutError] = useState('');
     const { signOut } = useAuth();
 
     async function handleLogout() {
-        await signOut();
-        navigate('/');
+        setIsLoggingOut(true);
+        setLogoutError('');
+
+        try {
+            await signOut();
+            navigate('/', { replace: true });
+        } catch (error) {
+            setLogoutError(error.response?.data?.message || 'Logout admin gagal.');
+        } finally {
+            setIsLoggingOut(false);
+        }
     }
 
     return (
@@ -73,6 +85,9 @@ export default function AdminSidebar() {
             </nav>
 
             <div className="mt-auto space-y-4 border-t border-outline-variant/15 pt-4">
+                {logoutError ? (
+                    <p className="rounded-xl bg-red-50 px-3 py-2 text-xs font-medium text-red-600">{logoutError}</p>
+                ) : null}
                 <button
                     type="button"
                     className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary-container px-4 py-2.5 text-sm font-bold text-white shadow-[0_4px_14px_0_rgba(29,78,216,0.39)] transition-opacity hover:opacity-90"
@@ -83,10 +98,11 @@ export default function AdminSidebar() {
                 <button
                     type="button"
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-error opacity-80 transition-all hover:bg-error-container hover:opacity-100"
+                    disabled={isLoggingOut}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-error opacity-80 transition-all hover:bg-error-container hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     <LogOut size={20} />
-                    Logout
+                    {isLoggingOut ? 'Keluar...' : 'Logout'}
                 </button>
             </div>
         </aside>

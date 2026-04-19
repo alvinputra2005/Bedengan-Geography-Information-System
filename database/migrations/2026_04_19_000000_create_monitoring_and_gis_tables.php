@@ -12,6 +12,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        $driver = DB::getDriverName();
+
         Schema::create('sensors', function (Blueprint $table) {
             $table->id();
             $table->string('device_id', 100)->unique();
@@ -220,7 +222,7 @@ return new class extends Migration
                 ->nullOnDelete();
         });
 
-        Schema::create('admin_activity_logs', function (Blueprint $table) {
+        Schema::create('admin_activity_logs', function (Blueprint $table) use ($driver) {
             $table->id();
             $table->foreignId('user_id')->nullable();
             $table->string('activity_type', 30);
@@ -228,6 +230,11 @@ return new class extends Migration
             $table->bigInteger('reference_id')->nullable();
             $table->text('description')->nullable();
             $table->text('user_agent')->nullable();
+            if ($driver === 'pgsql') {
+                $table->ipAddress('ip_address')->nullable();
+            } else {
+                $table->string('ip_address', 45)->nullable();
+            }
             $table->timestamp('created_at')->useCurrent();
 
             $table->foreign('user_id', 'fk_admin_activity_logs_user')
@@ -237,19 +244,19 @@ return new class extends Migration
                 ->nullOnDelete();
         });
 
-        DB::statement('ALTER TABLE admin_activity_logs ADD COLUMN ip_address INET');
-
-        DB::statement("ALTER TABLE sensors ADD CONSTRAINT chk_sensors_status CHECK (status IN ('active', 'inactive', 'maintenance'))");
-        DB::statement("ALTER TABLE sensor_readings ADD CONSTRAINT chk_sensor_readings_status CHECK (status_level IN ('safe', 'warning', 'danger', 'error'))");
-        DB::statement("ALTER TABLE alerts ADD CONSTRAINT chk_alerts_level CHECK (alert_level IN ('warning', 'danger'))");
-        DB::statement("ALTER TABLE notification_logs ADD CONSTRAINT chk_notification_logs_channel CHECK (channel IN ('dashboard', 'email', 'push', 'web'))");
-        DB::statement("ALTER TABLE notification_logs ADD CONSTRAINT chk_notification_logs_status CHECK (status IN ('queued', 'sent', 'failed'))");
-        DB::statement("ALTER TABLE tourist_places ADD CONSTRAINT chk_tourist_places_status CHECK (status IN ('active', 'inactive'))");
-        DB::statement("ALTER TABLE flood_zones ADD CONSTRAINT chk_flood_zones_risk CHECK (risk_level IN ('low', 'medium', 'high'))");
-        DB::statement("ALTER TABLE flood_zones ADD CONSTRAINT chk_flood_zones_status CHECK (status IN ('active', 'inactive'))");
-        DB::statement("ALTER TABLE evacuation_routes ADD CONSTRAINT chk_evacuation_routes_status CHECK (status IN ('active', 'inactive'))");
-        DB::statement("ALTER TABLE mitigation_contents ADD CONSTRAINT chk_mitigation_contents_status CHECK (status IN ('draft', 'published', 'archived'))");
-        DB::statement("ALTER TABLE admin_activity_logs ADD CONSTRAINT chk_admin_activity_logs_activity CHECK (activity_type IN ('create', 'update', 'delete', 'login', 'logout', 'acknowledge_alert'))");
+        if ($driver === 'pgsql') {
+            DB::statement("ALTER TABLE sensors ADD CONSTRAINT chk_sensors_status CHECK (status IN ('active', 'inactive', 'maintenance'))");
+            DB::statement("ALTER TABLE sensor_readings ADD CONSTRAINT chk_sensor_readings_status CHECK (status_level IN ('safe', 'warning', 'danger', 'error'))");
+            DB::statement("ALTER TABLE alerts ADD CONSTRAINT chk_alerts_level CHECK (alert_level IN ('warning', 'danger'))");
+            DB::statement("ALTER TABLE notification_logs ADD CONSTRAINT chk_notification_logs_channel CHECK (channel IN ('dashboard', 'email', 'push', 'web'))");
+            DB::statement("ALTER TABLE notification_logs ADD CONSTRAINT chk_notification_logs_status CHECK (status IN ('queued', 'sent', 'failed'))");
+            DB::statement("ALTER TABLE tourist_places ADD CONSTRAINT chk_tourist_places_status CHECK (status IN ('active', 'inactive'))");
+            DB::statement("ALTER TABLE flood_zones ADD CONSTRAINT chk_flood_zones_risk CHECK (risk_level IN ('low', 'medium', 'high'))");
+            DB::statement("ALTER TABLE flood_zones ADD CONSTRAINT chk_flood_zones_status CHECK (status IN ('active', 'inactive'))");
+            DB::statement("ALTER TABLE evacuation_routes ADD CONSTRAINT chk_evacuation_routes_status CHECK (status IN ('active', 'inactive'))");
+            DB::statement("ALTER TABLE mitigation_contents ADD CONSTRAINT chk_mitigation_contents_status CHECK (status IN ('draft', 'published', 'archived'))");
+            DB::statement("ALTER TABLE admin_activity_logs ADD CONSTRAINT chk_admin_activity_logs_activity CHECK (activity_type IN ('create', 'update', 'delete', 'login', 'logout', 'acknowledge_alert'))");
+        }
     }
 
     /**

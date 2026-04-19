@@ -21,7 +21,7 @@ Route::get('/health', [HealthController::class, 'show']);
 Route::prefix('auth')->middleware('web')->group(function () {
     Route::post('/login', [AuthController::class, 'store']);
     Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/logout', [AuthController::class, 'destroy'])->middleware('auth:sanctum');
+    Route::post('/logout', [AuthController::class, 'destroy']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

@@ -15,6 +15,8 @@ export async function register(payload) {
 }
 
 export async function logout() {
+    await getCsrfCookie();
+
     const { data } = await api.post('/api/auth/logout');
     return data;
 }

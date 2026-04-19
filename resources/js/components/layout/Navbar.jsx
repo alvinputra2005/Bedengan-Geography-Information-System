@@ -33,6 +33,7 @@ export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [logoutError, setLogoutError] = useState('');
     const navigate = useNavigate();
     const { user, isAuthenticated, isAdmin, signOut } = useAuth();
     const workspaceRoute = getDefaultPrivateRoute(user);
@@ -48,10 +49,13 @@ export default function Navbar() {
 
     async function handleLogout() {
         setIsLoggingOut(true);
+        setLogoutError('');
 
         try {
             await signOut();
-            navigate('/');
+            navigate('/', { replace: true });
+        } catch (error) {
+            setLogoutError(error.response?.data?.message || 'Logout gagal. Silakan coba lagi.');
         } finally {
             setIsLoggingOut(false);
             setMenuOpen(false);
@@ -130,6 +134,12 @@ export default function Navbar() {
                         {menuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
                 </div>
+
+                {logoutError ? (
+                    <div className="max-w-[1440px] mx-auto px-6 md:px-12 pb-3">
+                        <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{logoutError}</p>
+                    </div>
+                ) : null}
 
                 {menuOpen && (
                     <div className="lg:hidden px-6 md:px-12 pb-4">
