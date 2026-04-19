@@ -9,15 +9,13 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-COPY composer.json composer.lock package*.json ./
+COPY . .
 
 RUN composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
 RUN npm install
-
-COPY . .
-
 RUN npm run build
 
-RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache
 
-CMD sh -c "php artisan key:generate --force || true; php artisan migrate --seed --force || true; php artisan serve --host=0.0.0.0 --port=${PORT:-10000}"
+CMD sh -c "php artisan serve --host=0.0.0.0 --port=${PORT:-10000}"
