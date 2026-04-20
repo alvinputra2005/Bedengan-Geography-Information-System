@@ -82,6 +82,13 @@ class MitigationReportController extends Controller
         ]);
     }
 
+    public function show(MitigationReport $mitigationReport): JsonResponse
+    {
+        return response()->json([
+            'data' => $this->transformReport($mitigationReport->load(['reporter:id,name,email', 'reviewer:id,name'])),
+        ]);
+    }
+
     public function update(Request $request, MitigationReport $mitigationReport): JsonResponse
     {
         $validated = $request->validate([

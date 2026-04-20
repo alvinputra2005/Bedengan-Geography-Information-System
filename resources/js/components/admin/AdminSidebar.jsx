@@ -16,7 +16,7 @@ import { useAuth } from '../../hooks/useAuth';
 const adminNavItems = [
     { icon: LayoutDashboard, label: 'Dashboard', to: '/admin' },
     { icon: Trees, label: 'Data Camping', to: '/admin/camping' },
-    { icon: MapIcon, label: 'Peta Spasial', to: '/admin/map' },
+    // { icon: MapIcon, label: 'Peta Spasial', to: '/admin/map' },
     { icon: AlertTriangle, label: 'Laporan Mitigasi', to: '/admin/mitigation' },
 ];
 

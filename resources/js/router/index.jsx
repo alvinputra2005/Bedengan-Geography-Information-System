@@ -16,6 +16,7 @@ const RegisterPage = lazy(() => import('../pages/auth/RegisterPage'));
 const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage'));
 const AdminCampingPage = lazy(() => import('../pages/admin/AdminCampingPage'));
 const AdminMitigationPage = lazy(() => import('../pages/admin/AdminMitigationPage'));
+const AdminMitigationDetailPage = lazy(() => import('../pages/admin/AdminMitigationDetailPage'));
 const NotFoundPage = lazy(() => import('../pages/system/NotFoundPage'));
 
 function RouteFallback({ message = 'Memuat halaman...' }) {
@@ -135,6 +136,10 @@ export const router = createBrowserRouter([
             {
                 path: 'mitigation',
                 element: withSuspense(AdminMitigationPage, null, 'Memuat laporan mitigasi...'),
+            },
+            {
+                path: 'mitigation/:reportId',
+                element: withSuspense(AdminMitigationDetailPage, null, 'Memuat detail laporan mitigasi...'),
             },
             {
                 path: 'settings',

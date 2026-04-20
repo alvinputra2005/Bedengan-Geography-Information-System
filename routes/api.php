@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/camping-grounds/{campingGround}', [CampingGroundController::class, 'update']);
         Route::delete('/camping-grounds/{campingGround}', [CampingGroundController::class, 'destroy']);
         Route::get('/mitigation-reports', [MitigationReportController::class, 'index']);
+        Route::get('/mitigation-reports/{mitigationReport}', [MitigationReportController::class, 'show']);
         Route::put('/mitigation-reports/{mitigationReport}', [MitigationReportController::class, 'update']);
     });
 });

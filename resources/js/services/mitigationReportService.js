@@ -33,6 +33,11 @@ export async function fetchAdminMitigationReports() {
     return data;
 }
 
+export async function fetchAdminMitigationReport(id) {
+    const { data } = await api.get(`/api/admin/mitigation-reports/${id}`);
+    return data;
+}
+
 export async function updateMitigationReport(id, payload) {
     const { data } = await api.put(`/api/admin/mitigation-reports/${id}`, serializeAdminPayload(payload));
     return data;

@@ -83,3 +83,22 @@ export function getInitials(name) {
         .map((part) => part.charAt(0).toUpperCase())
         .join('');
 }
+
+export function buildReportHeadline(report) {
+    const category = (report?.incident_category ?? '').trim();
+    const location = (report?.incident_location ?? '').trim();
+
+    if (category && location) {
+        return `${category} di ${location}`;
+    }
+
+    if (category) {
+        return `Insiden ${category}`;
+    }
+
+    if (location) {
+        return `Laporan insiden di ${location}`;
+    }
+
+    return report?.report_code ?? 'Detail Laporan';
+}
