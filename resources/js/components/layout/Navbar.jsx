@@ -68,13 +68,10 @@ export default function Navbar() {
                 <div className="max-w-[1440px] mx-auto px-6 md:px-12 flex justify-between items-center min-h-14">
                     <Link
                         to="/"
-                        className="flex items-center flex-shrink-0"
+                        className="text-2xl font-extrabold tracking-tighter text-gradient font-headline flex items-center gap-2 flex-shrink-0"
                     >
-                        <img
-                            src="/images/logo_aqualert.png"
-                            alt="Aqualert"
-                            className="h-10 w-auto"
-                        />
+                        <Trees className="text-primary" size={32} />
+                        <span>Aqualert</span>
                     </Link>
 
                     <div className="hidden lg:flex items-center font-headline font-semibold text-sm tracking-wide bg-surface-container-lowest/30 p-1.5 rounded-full border border-black/5 mx-8">

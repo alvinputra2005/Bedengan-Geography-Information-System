@@ -24,7 +24,7 @@ export default function AdminMitigationDetailContent({ report }) {
                 )}
             </section>
 
-            <section className="rounded-xl bg-surface-container-low p-6">
+            <section className="rounded-xl bg-white shadow-[0_18px_40px_-34px_rgba(19,27,46,0.45)] p-6">
                 <h3 className="mb-3 font-headline text-sm font-bold uppercase tracking-wider text-on-surface-variant">
                     Deskripsi Insiden
                 </h3>
