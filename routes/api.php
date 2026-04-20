@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/health', [HealthController::class, 'show']);
-Route::get('/camping-grounds', [CampingGroundController::class, 'index']);
+Route::get('/camping-grounds', [CampingGroundController::class, 'publicIndex']);
 
 Route::prefix('auth')->middleware('web')->group(function () {
     Route::post('/login', [AuthController::class, 'store']);
@@ -31,8 +31,15 @@ Route::prefix('auth')->middleware('web')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'show']);
     Route::get('/user', [AuthController::class, 'show']);
-    Route::get('/admin/dashboard', [AdminDashboardController::class, 'show'])->middleware('role:admin');
     Route::get('/bedengans', [BedenganController::class, 'index']);
     Route::get('/bedengans/{bedengan}', [BedenganController::class, 'show']);
     Route::get('/route', [RouteController::class, 'show']);
+
+    Route::middleware('role:admin')->prefix('admin')->group(function () {
+        Route::get('/dashboard', [AdminDashboardController::class, 'show']);
+        Route::get('/camping-grounds', [CampingGroundController::class, 'adminIndex']);
+        Route::post('/camping-grounds', [CampingGroundController::class, 'store']);
+        Route::put('/camping-grounds/{campingGround}', [CampingGroundController::class, 'update']);
+        Route::delete('/camping-grounds/{campingGround}', [CampingGroundController::class, 'destroy']);
+    });
 });
