@@ -1,4 +1,5 @@
-import { BellRing, CloudUpload, ShieldCheck, TriangleAlert } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { BellRing, CloudUpload, LoaderCircle, ShieldCheck, TriangleAlert } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import {
@@ -7,6 +8,9 @@ import {
     pageSectionGapClassName,
     pageShellClassName,
 } from '../../components/layout/pageSpacing';
+import { useAuth } from '../../hooks/useAuth';
+import { isSupabaseConfigured } from '../../lib/supabase';
+import { createMitigationReport, uploadMitigationReportImage } from '../../services/mitigationReportService';
 
 const heroStats = [
     {
@@ -74,6 +78,33 @@ const responseChecklist = [
     'Periksa ulang prakiraan cuaca sebelum bermalam.',
 ];
 
+const incidentCategories = [
+    'Kenaikan debit air',
+    'Cedera pengunjung',
+    'Longsor kecil',
+    'Kehilangan arah',
+    'Kerusakan fasilitas',
+    'Lainnya',
+];
+
+const incidentLocations = [
+    'Ground A',
+    'Ground B',
+    'Ground C',
+    'Area Sungai',
+    'Jalur Masuk',
+    'Pos Jaga',
+];
+
+const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const INITIAL_FORM = {
+    reporterName: '',
+    incidentCategory: '',
+    incidentLocation: '',
+    description: '',
+};
+
 function SectionHeader({ eyebrow, title, description }) {
     return (
         <div className="max-w-3xl">
@@ -84,12 +115,121 @@ function SectionHeader({ eyebrow, title, description }) {
     );
 }
 
+function getFieldError(errors, field) {
+    const value = errors?.[field];
+
+    if (Array.isArray(value)) {
+        return value[0] ?? '';
+    }
+
+    return typeof value === 'string' ? value : '';
+}
+
 export default function MitigationPage() {
-    const mitigationSteps = [
-        'Pantau perubahan status sensor dan konfirmasi area terdampak pada dashboard.',
-        'Arahkan pengunjung ke jalur evakuasi terdekat sesuai zona pada peta.',
-        'Sampaikan pembaruan kondisi lapangan ke operator dan dokumentasikan tindak lanjut.',
-    ];
+    const { user } = useAuth();
+    const [form, setForm] = useState(INITIAL_FORM);
+    const [formErrors, setFormErrors] = useState({});
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [fileError, setFileError] = useState('');
+    const [submitError, setSubmitError] = useState('');
+    const [submitSuccess, setSubmitSuccess] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        setForm((current) => ({
+            ...current,
+            reporterName: current.reporterName || user?.name || '',
+        }));
+    }, [user?.name]);
+
+    function handleInputChange(event) {
+        const { name, value } = event.target;
+
+        setForm((current) => ({
+            ...current,
+            [name]: value,
+        }));
+    }
+
+    function resetForm() {
+        setForm({
+            ...INITIAL_FORM,
+            reporterName: user?.name || '',
+        });
+        setFormErrors({});
+        setSelectedFile(null);
+        setFileError('');
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    }
+
+    function handleFileChange(event) {
+        const nextFile = event.target.files?.[0] ?? null;
+
+        setFileError('');
+        setSelectedFile(null);
+
+        if (!nextFile) {
+            return;
+        }
+
+        if (!ACCEPTED_FILE_TYPES.includes(nextFile.type)) {
+            setFileError('Gunakan file JPG, PNG, atau WEBP.');
+            event.target.value = '';
+            return;
+        }
+
+        if (nextFile.size > MAX_FILE_SIZE_BYTES) {
+            setFileError('Ukuran foto maksimal 5 MB.');
+            event.target.value = '';
+            return;
+        }
+
+        setSelectedFile(nextFile);
+    }
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+        setIsSubmitting(true);
+        setFormErrors({});
+        setFileError('');
+        setSubmitError('');
+        setSubmitSuccess('');
+
+        try {
+            let uploadedImage = null;
+
+            if (selectedFile) {
+                uploadedImage = await uploadMitigationReportImage(selectedFile);
+            }
+
+            const response = await createMitigationReport({
+                ...form,
+                photoBucket: uploadedImage?.bucket ?? '',
+                photoPath: uploadedImage?.path ?? '',
+                photoUrl: uploadedImage?.publicUrl ?? '',
+            });
+
+            setSubmitSuccess(response?.message || 'Laporan mitigasi berhasil dikirim.');
+            resetForm();
+        } catch (error) {
+            if (error.response?.status === 422) {
+                setFormErrors(error.response?.data?.errors ?? {});
+            } else {
+                const message = error.message || error.response?.data?.message || 'Pengiriman laporan gagal.';
+                if (message.toLowerCase().includes('supabase')) {
+                    setFileError(message);
+                } else {
+                    setSubmitError(message);
+                }
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
 
     return (
         <main className={pageShellClassName}>
@@ -297,6 +437,15 @@ export default function MitigationPage() {
                                     jika tersedia agar respons lapangan lebih tepat.
                                 </p>
                             </div>
+                            <div className="rounded-2xl bg-surface-container-low px-4 py-3">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-on-surface/50">
+                                    Integrasi admin
+                                </p>
+                                <p className="mt-2 text-sm font-medium leading-relaxed text-on-surface-variant">
+                                    Semua laporan yang terkirim akan langsung masuk ke panel admin pada menu Laporan
+                                    Mitigasi untuk ditinjau, diprioritaskan, dan ditindaklanjuti.
+                                </p>
+                            </div>
                         </div>
                     </motion.div>
 
@@ -314,17 +463,55 @@ export default function MitigationPage() {
                             <h3 className="font-headline text-2xl font-extrabold text-on-surface">Lapor Insiden</h3>
                         </div>
 
-                        <form className="mt-6 space-y-5">
+                        {submitError ? (
+                            <p className="mt-6 rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{submitError}</p>
+                        ) : null}
+                        {submitSuccess ? (
+                            <p className="mt-6 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                                {submitSuccess}
+                            </p>
+                        ) : null}
+
+                        <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
                             <div>
                                 <label className="mb-2 block text-sm font-bold text-on-surface" htmlFor="reporter-name">
                                     Nama Pelapor
                                 </label>
                                 <input
                                     id="reporter-name"
+                                    name="reporterName"
                                     type="text"
+                                    value={form.reporterName}
+                                    onChange={handleInputChange}
                                     placeholder="Masukkan nama Anda"
                                     className="w-full rounded-2xl border border-black/5 bg-surface-container-low px-4 py-3 text-sm font-medium text-on-surface outline-none transition-colors placeholder:text-on-surface/40 focus:border-primary/30"
                                 />
+                                {getFieldError(formErrors, 'reporter_name') ? (
+                                    <p className="mt-2 text-xs font-medium text-red-600">{getFieldError(formErrors, 'reporter_name')}</p>
+                                ) : null}
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-bold text-on-surface" htmlFor="incident-category">
+                                    Jenis Insiden
+                                </label>
+                                <select
+                                    id="incident-category"
+                                    name="incidentCategory"
+                                    value={form.incidentCategory}
+                                    onChange={handleInputChange}
+                                    className="w-full rounded-2xl border border-black/5 bg-surface-container-low px-4 py-3 text-sm font-medium text-on-surface outline-none transition-colors focus:border-primary/30"
+                                >
+                                    <option value="">Pilih jenis insiden...</option>
+                                    {incidentCategories.map((item) => (
+                                        <option key={item} value={item}>
+                                            {item}
+                                        </option>
+                                    ))}
+                                </select>
+                                {getFieldError(formErrors, 'incident_category') ? (
+                                    <p className="mt-2 text-xs font-medium text-red-600">{getFieldError(formErrors, 'incident_category')}</p>
+                                ) : null}
                             </div>
 
                             <div>
@@ -333,19 +520,21 @@ export default function MitigationPage() {
                                 </label>
                                 <select
                                     id="incident-location"
-                                    defaultValue=""
+                                    name="incidentLocation"
+                                    value={form.incidentLocation}
+                                    onChange={handleInputChange}
                                     className="w-full rounded-2xl border border-black/5 bg-surface-container-low px-4 py-3 text-sm font-medium text-on-surface outline-none transition-colors focus:border-primary/30"
                                 >
-                                    <option value="" disabled>
-                                        Pilih area...
-                                    </option>
-                                    <option>Ground A</option>
-                                    <option>Ground B</option>
-                                    <option>Ground C</option>
-                                    <option>Area Sungai</option>
-                                    <option>Jalur Masuk</option>
-                                    <option>Pos Jaga</option>
+                                    <option value="">Pilih area...</option>
+                                    {incidentLocations.map((item) => (
+                                        <option key={item} value={item}>
+                                            {item}
+                                        </option>
+                                    ))}
                                 </select>
+                                {getFieldError(formErrors, 'incident_location') ? (
+                                    <p className="mt-2 text-xs font-medium text-red-600">{getFieldError(formErrors, 'incident_location')}</p>
+                                ) : null}
                             </div>
 
                             <div>
@@ -354,26 +543,59 @@ export default function MitigationPage() {
                                 </label>
                                 <textarea
                                     id="incident-description"
+                                    name="description"
                                     rows={4}
+                                    value={form.description}
+                                    onChange={handleInputChange}
                                     placeholder="Jelaskan apa yang terjadi..."
                                     className="w-full rounded-2xl border border-black/5 bg-surface-container-low px-4 py-3 text-sm font-medium text-on-surface outline-none transition-colors placeholder:text-on-surface/40 focus:border-primary/30"
                                 ></textarea>
+                                {getFieldError(formErrors, 'description') ? (
+                                    <p className="mt-2 text-xs font-medium text-red-600">{getFieldError(formErrors, 'description')}</p>
+                                ) : null}
                             </div>
 
                             <div>
-                                <p className="mb-2 block text-sm font-bold text-on-surface">Bukti Foto (Opsional)</p>
+                                <div className="mb-2 flex items-center justify-between gap-4">
+                                    <p className="block text-sm font-bold text-on-surface">Bukti Foto (Opsional)</p>
+                                    <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-on-surface/45">
+                                        JPG, PNG, WEBP hingga 5 MB
+                                    </span>
+                                </div>
+
                                 <label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-primary/20 bg-surface-container-low px-6 py-8 text-center transition-colors hover:border-primary/35 hover:bg-primary/5">
                                     <CloudUpload className="text-on-surface/45" size={28} />
-                                    <span className="text-sm font-medium text-on-surface-variant">Klik untuk unggah foto</span>
-                                    <input type="file" className="hidden" />
+                                    <span className="text-sm font-medium text-on-surface-variant">
+                                        {selectedFile ? selectedFile.name : 'Klik untuk unggah foto'}
+                                    </span>
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/png,image/jpeg,image/webp"
+                                        className="hidden"
+                                        onChange={handleFileChange}
+                                    />
                                 </label>
+
+                                {!isSupabaseConfigured() ? (
+                                    <p className="mt-2 text-xs font-medium text-amber-700">
+                                        Upload foto akan aktif setelah `VITE_SUPABASE_URL` dan `VITE_SUPABASE_PUBLISHABLE_KEY`
+                                        diisi.
+                                    </p>
+                                ) : null}
+                                {fileError ? <p className="mt-2 text-xs font-medium text-red-600">{fileError}</p> : null}
+                                {getFieldError(formErrors, 'photo_url') ? (
+                                    <p className="mt-2 text-xs font-medium text-red-600">{getFieldError(formErrors, 'photo_url')}</p>
+                                ) : null}
                             </div>
 
                             <button
-                                type="button"
-                                className="w-full rounded-2xl bg-gradient-primary px-5 py-3.5 text-sm font-bold text-white transition-all hover:shadow-xl hover:shadow-primary/20"
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary px-5 py-3.5 text-sm font-bold text-white transition-all hover:shadow-xl hover:shadow-primary/20 disabled:cursor-not-allowed disabled:opacity-70"
                             >
-                                Kirim Laporan
+                                {isSubmitting ? <LoaderCircle size={18} className="animate-spin" /> : null}
+                                {isSubmitting ? 'Mengirim laporan...' : 'Kirim Laporan'}
                             </button>
                         </form>
                     </motion.div>

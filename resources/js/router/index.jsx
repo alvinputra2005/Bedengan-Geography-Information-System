@@ -15,6 +15,7 @@ const LoginPage = lazy(() => import('../pages/auth/LoginPage'));
 const RegisterPage = lazy(() => import('../pages/auth/RegisterPage'));
 const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage'));
 const AdminCampingPage = lazy(() => import('../pages/admin/AdminCampingPage'));
+const AdminMitigationPage = lazy(() => import('../pages/admin/AdminMitigationPage'));
 const NotFoundPage = lazy(() => import('../pages/system/NotFoundPage'));
 
 function RouteFallback({ message = 'Memuat halaman...' }) {
@@ -133,13 +134,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'mitigation',
-                element: (
-                    <AdminPlaceholderPage
-                        title="Laporan Mitigasi"
-                        subtitle="Kelola laporan insiden dan alur tindak lanjut mitigasi risiko."
-                        description="Halaman ini nantinya dipakai untuk meninjau laporan masuk, mengurutkan prioritas, dan mendokumentasikan tindakan mitigasi."
-                    />
-                ),
+                element: withSuspense(AdminMitigationPage, null, 'Memuat laporan mitigasi...'),
             },
             {
                 path: 'settings',

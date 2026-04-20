@@ -200,18 +200,7 @@ export default function CampingGroundPage() {
             <section className={`${pageGutterClassName} ${pageSectionGapClassName}`}>
                 <div className={pageContainerClassName}>
                     <section className="w-full">
-                        {isLoading ? (
-                            <div className="mb-6 rounded-[2rem] border border-black/5 bg-white/75 px-5 py-4 text-sm font-semibold text-on-surface-variant">
-                                Memuat data area camping dari database...
-                            </div>
-                        ) : null}
-
-                        {error ? (
-                            <div className="mb-6 rounded-[2rem] border border-red-100 bg-red-50 px-5 py-4 text-sm font-medium text-red-600">
-                                {error}
-                            </div>
-                        ) : null}
-
+                        
                         <div className="mb-8 flex flex-col gap-4 rounded-[2rem] border border-black/5 bg-white/75 p-4 backdrop-blur-sm md:flex-row md:items-center md:justify-between">
                             <div className="flex flex-wrap gap-2">
                                 {CAMPING_FILTER_OPTIONS.map((option) => (

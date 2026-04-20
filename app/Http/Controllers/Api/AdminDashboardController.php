@@ -37,7 +37,7 @@ class AdminDashboardController extends Controller
             'registered_users' => DB::table('users')->count(),
             'active_sensors' => DB::table('sensors')->where('status', 'active')->count(),
             'total_sensors' => DB::table('sensors')->count(),
-            'total_mitigation_reports' => DB::table('mitigation_contents')->where('status', 'published')->count(),
+            'total_mitigation_reports' => DB::table('mitigation_reports')->count(),
         ];
 
         $latestSensorReading = DB::table('sensor_readings as sr')

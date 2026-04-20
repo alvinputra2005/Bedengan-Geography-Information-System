@@ -43,7 +43,7 @@ export default function AdminKpiSection({ summary }) {
             icon: FileText,
             label: 'Total Laporan Mitigasi',
             value: (summary?.total_mitigation_reports ?? 0).toLocaleString('id-ID'),
-            helperText: 'Konten mitigasi yang sudah dipublikasikan.',
+            helperText: 'Laporan insiden yang sudah masuk ke panel admin.',
         },
     ];
 
