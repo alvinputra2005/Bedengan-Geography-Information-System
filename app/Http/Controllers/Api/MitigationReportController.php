@@ -4,12 +4,19 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\MitigationReport;
+use App\Services\SupabaseStorageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class MitigationReportController extends Controller
 {
+    public function __construct(
+        protected SupabaseStorageService $storageService
+    ) {
+    }
+
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -17,12 +24,21 @@ class MitigationReportController extends Controller
             'incident_location' => ['required', 'string', 'max:150'],
             'incident_category' => ['nullable', 'string', 'max:60'],
             'description' => ['required', 'string', 'max:5000'],
-            'photo_bucket' => ['nullable', 'string', 'max:120'],
-            'photo_path' => ['nullable', 'string', 'max:255'],
-            'photo_url' => ['nullable', 'url', 'max:2000'],
+            'photo' => ['nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         $user = $request->user();
+        $uploadedPhoto = null;
+
+        if ($request->hasFile('photo')) {
+            try {
+                $uploadedPhoto = $this->storageService->uploadMitigationReportImage($request->file('photo'));
+            } catch (RuntimeException $exception) {
+                return response()->json([
+                    'message' => $exception->getMessage(),
+                ], 500);
+            }
+        }
 
         $report = MitigationReport::query()->create([
             'report_code' => $this->generateReportCode(),
@@ -34,15 +50,9 @@ class MitigationReportController extends Controller
                 ? trim($validated['incident_category'])
                 : null,
             'description' => trim($validated['description']),
-            'photo_bucket' => filled($validated['photo_bucket'] ?? null)
-                ? trim($validated['photo_bucket'])
-                : null,
-            'photo_path' => filled($validated['photo_path'] ?? null)
-                ? trim($validated['photo_path'])
-                : null,
-            'photo_url' => filled($validated['photo_url'] ?? null)
-                ? trim($validated['photo_url'])
-                : null,
+            'photo_bucket' => $uploadedPhoto['bucket'] ?? null,
+            'photo_path' => $uploadedPhoto['path'] ?? null,
+            'photo_url' => $uploadedPhoto['public_url'] ?? null,
             'reported_at' => now(),
         ]);
 
@@ -118,7 +128,7 @@ class MitigationReportController extends Controller
             'description' => $report->description,
             'photo_bucket' => $report->photo_bucket,
             'photo_path' => $report->photo_path,
-            'photo_url' => $report->photo_url,
+            'photo_url' => $this->storageService->resolveAssetUrl($report->photo_bucket, $report->photo_path) ?? $report->photo_url,
             'status' => $report->status,
             'priority' => $report->priority,
             'admin_notes' => $report->admin_notes,

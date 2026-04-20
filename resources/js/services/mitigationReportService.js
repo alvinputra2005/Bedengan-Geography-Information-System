@@ -1,52 +1,18 @@
 import api from '../lib/api';
-import { getSupabaseClient } from '../lib/supabase';
-
-const MITIGATION_REPORT_BUCKET = 'mitigation-report';
-
-function buildFilePath(file) {
-    const rawExtension = file.name.includes('.') ? file.name.split('.').pop() : '';
-    const extension = String(rawExtension || file.type.split('/').pop() || 'jpg')
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, '');
-    const uniqueId = typeof crypto !== 'undefined' && crypto.randomUUID
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.round(Math.random() * 100000)}`;
-
-    return `reports/${new Date().toISOString().slice(0, 10)}/${uniqueId}.${extension || 'jpg'}`;
-}
-
-export async function uploadMitigationReportImage(file) {
-    const supabase = getSupabaseClient();
-    const filePath = buildFilePath(file);
-    const { data, error } = await supabase.storage.from(MITIGATION_REPORT_BUCKET).upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false,
-        contentType: file.type || undefined,
-    });
-
-    if (error) {
-        throw new Error(error.message || 'Upload gambar ke Supabase gagal.');
-    }
-
-    const { data: publicUrlData } = supabase.storage.from(MITIGATION_REPORT_BUCKET).getPublicUrl(data?.path ?? filePath);
-
-    return {
-        bucket: MITIGATION_REPORT_BUCKET,
-        path: data?.path ?? filePath,
-        publicUrl: publicUrlData?.publicUrl ?? '',
-    };
-}
 
 function serializeCreatePayload(payload) {
-    return {
-        reporter_name: payload.reporterName?.trim() ?? '',
-        incident_location: payload.incidentLocation?.trim() ?? '',
-        incident_category: payload.incidentCategory?.trim() ?? '',
-        description: payload.description?.trim() ?? '',
-        photo_bucket: payload.photoBucket?.trim() ?? '',
-        photo_path: payload.photoPath?.trim() ?? '',
-        photo_url: payload.photoUrl?.trim() ?? '',
-    };
+    const formData = new FormData();
+
+    formData.append('reporter_name', payload.reporterName?.trim() ?? '');
+    formData.append('incident_location', payload.incidentLocation?.trim() ?? '');
+    formData.append('incident_category', payload.incidentCategory?.trim() ?? '');
+    formData.append('description', payload.description?.trim() ?? '');
+
+    if (payload.photo instanceof File) {
+        formData.append('photo', payload.photo);
+    }
+
+    return formData;
 }
 
 function serializeAdminPayload(payload) {

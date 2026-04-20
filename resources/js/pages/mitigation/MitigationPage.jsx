@@ -9,8 +9,7 @@ import {
     pageShellClassName,
 } from '../../components/layout/pageSpacing';
 import { useAuth } from '../../hooks/useAuth';
-import { isSupabaseConfigured } from '../../lib/supabase';
-import { createMitigationReport, uploadMitigationReportImage } from '../../services/mitigationReportService';
+import { createMitigationReport } from '../../services/mitigationReportService';
 
 const heroStats = [
     {
@@ -200,17 +199,9 @@ export default function MitigationPage() {
         setSubmitSuccess('');
 
         try {
-            let uploadedImage = null;
-
-            if (selectedFile) {
-                uploadedImage = await uploadMitigationReportImage(selectedFile);
-            }
-
             const response = await createMitigationReport({
                 ...form,
-                photoBucket: uploadedImage?.bucket ?? '',
-                photoPath: uploadedImage?.path ?? '',
-                photoUrl: uploadedImage?.publicUrl ?? '',
+                photo: selectedFile,
             });
 
             setSubmitSuccess(response?.message || 'Laporan mitigasi berhasil dikirim.');
@@ -220,11 +211,7 @@ export default function MitigationPage() {
                 setFormErrors(error.response?.data?.errors ?? {});
             } else {
                 const message = error.message || error.response?.data?.message || 'Pengiriman laporan gagal.';
-                if (message.toLowerCase().includes('supabase')) {
-                    setFileError(message);
-                } else {
-                    setSubmitError(message);
-                }
+                setSubmitError(message);
             }
         } finally {
             setIsSubmitting(false);
@@ -577,15 +564,9 @@ export default function MitigationPage() {
                                     />
                                 </label>
 
-                                {!isSupabaseConfigured() ? (
-                                    <p className="mt-2 text-xs font-medium text-amber-700">
-                                        Upload foto akan aktif setelah `VITE_SUPABASE_URL` dan `VITE_SUPABASE_PUBLISHABLE_KEY`
-                                        diisi.
-                                    </p>
-                                ) : null}
                                 {fileError ? <p className="mt-2 text-xs font-medium text-red-600">{fileError}</p> : null}
-                                {getFieldError(formErrors, 'photo_url') ? (
-                                    <p className="mt-2 text-xs font-medium text-red-600">{getFieldError(formErrors, 'photo_url')}</p>
+                                {getFieldError(formErrors, 'photo') ? (
+                                    <p className="mt-2 text-xs font-medium text-red-600">{getFieldError(formErrors, 'photo')}</p>
                                 ) : null}
                             </div>
 

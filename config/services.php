@@ -35,4 +35,12 @@ return [
         'base_url' => env('OSRM_BASE_URL', ''),
     ],
 
+    'supabase' => [
+        'url' => env('SUPABASE_URL', env('VITE_SUPABASE_URL', '')),
+        'service_role_key' => env('SUPABASE_SERVICE_ROLE_KEY', ''),
+        'mitigation_report_bucket' => env('SUPABASE_MITIGATION_REPORT_BUCKET', 'mitigation-report'),
+        'mitigation_report_bucket_public' => env('SUPABASE_MITIGATION_REPORT_BUCKET_PUBLIC', true),
+        'signed_url_ttl' => env('SUPABASE_SIGNED_URL_TTL', 3600),
+    ],
+
 ];
