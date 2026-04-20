@@ -1,5 +1,10 @@
 import api from '../lib/api';
 
+export async function fetchActiveBedengan() {
+    const { data } = await api.get('/api/bedengans');
+    return data?.data?.[0] ?? null;
+}
+
 export async function fetchBedengans() {
     const { data } = await api.get('/api/bedengans');
     return data;

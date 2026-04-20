@@ -1,6 +1,12 @@
 import { BellRing, CloudUpload, ShieldCheck, TriangleAlert } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
+import {
+    pageContainerClassName,
+    pageGutterClassName,
+    pageSectionGapClassName,
+    pageShellClassName,
+} from '../../components/layout/pageSpacing';
 
 const heroStats = [
     {
@@ -86,9 +92,9 @@ export default function MitigationPage() {
     ];
 
     return (
-        <main className="overflow-hidden pb-20 pt-28 md:pt-32">
-            <section className="px-6 md:px-12 lg:px-20">
-                <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+        <main className={pageShellClassName}>
+            <section className={pageGutterClassName}>
+                <div className={`${pageContainerClassName} grid grid-cols-1 gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center`}>
                     <motion.div
                         initial={{ opacity: 0, y: 28 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -201,8 +207,8 @@ export default function MitigationPage() {
                 </div>
             </section>
 
-            <section className="px-6 pt-16 md:px-12 md:pt-20 lg:px-20">
-                <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-[0.85fr_1.15fr]">
+            <section className={`${pageGutterClassName} ${pageSectionGapClassName}`}>
+                <div className={`${pageContainerClassName} grid grid-cols-1 gap-8 lg:grid-cols-[0.85fr_1.15fr]`}>
                     <motion.div
                         initial={{ opacity: 0, y: 24 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -257,8 +263,8 @@ export default function MitigationPage() {
                 </div>
             </section>
 
-            <section className="px-6 pt-16 md:px-12 md:pt-20 lg:px-20">
-                <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+            <section className={`${pageGutterClassName} ${pageSectionGapClassName}`}>
+                <div className={`${pageContainerClassName} grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr]`}>
                     <motion.div
                         initial={{ opacity: 0, y: 24 }}
                         whileInView={{ opacity: 1, y: 0 }}

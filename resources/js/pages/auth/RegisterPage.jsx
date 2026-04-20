@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { centeredPageShellClassName } from '../../components/layout/pageSpacing';
 import { useAuth } from '../../hooks/useAuth';
 import { getDefaultPrivateRoute } from '../../utils/auth';
 
@@ -46,7 +47,7 @@ export default function RegisterPage() {
     }
 
     return (
-        <main className="flex min-h-screen items-center justify-center px-6 py-16">
+        <main className={centeredPageShellClassName}>
             <div className="w-full max-w-xl rounded-[2rem] border border-black/5 bg-white p-8 shadow-xl shadow-black/5">
                 <p className="mb-4 text-xs font-bold uppercase tracking-[0.24em] text-primary">Pendaftaran Akun</p>
                 <h1 className="mb-3 font-headline text-4xl font-extrabold text-on-surface">Sign Up</h1>

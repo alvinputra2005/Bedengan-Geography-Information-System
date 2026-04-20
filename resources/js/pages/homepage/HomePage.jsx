@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
+import { pageContainerClassName, pageGutterClassName } from '../../components/layout/pageSpacing';
 
 const sectionReveal = {
     initial: { opacity: 0, y: 40 },
@@ -63,7 +64,7 @@ export default function HomePage() {
     return (
         <main className="pb-20">
             <motion.section
-                className="relative w-full px-6 pb-24 pt-28 md:px-12 md:pb-28 md:pt-32 lg:px-20 lg:pb-32 lg:pt-36 overflow-hidden mb-8 md:mb-10 lg:mb-12 min-h-[780px] md:min-h-[860px] lg:min-h-[920px] flex items-center"
+                className={`relative w-full ${pageGutterClassName} overflow-hidden mb-8 flex min-h-[780px] items-center pb-24 pt-28 md:mb-10 md:pb-28 md:pt-32 lg:mb-12 lg:pb-32 lg:pt-36`}
                 id="beranda"
                 {...sectionReveal}
             >
@@ -84,7 +85,7 @@ export default function HomePage() {
 
                 <div className="absolute inset-x-0 bottom-0 h-72 md:h-80 lg:h-96 bg-gradient-to-t from-[#faf8ff] via-[#faf8ff]/90 to-transparent z-10"></div>
 
-                <div className="relative z-10 max-w-[1440px] mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+                <div className={`relative z-10 ${pageContainerClassName} grid grid-cols-1 items-center gap-16 lg:grid-cols-2 lg:gap-20`}>
                     <motion.div
                         initial={{ opacity: 0, x: -30 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -140,7 +141,7 @@ export default function HomePage() {
             </motion.section>
 
             <motion.section
-                className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-20 mb-16 md:mb-20 lg:mb-24 relative"
+                className={`${pageContainerClassName} ${pageGutterClassName} relative mb-16 md:mb-20 lg:mb-24`}
                 id="monitoring"
                 {...sectionReveal}
             >
@@ -269,7 +270,7 @@ export default function HomePage() {
 
             <motion.section className="relative overflow-hidden py-16 md:py-20 lg:py-24 bg-transparent" {...sectionReveal}>
                 <motion.div
-                    className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-20 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center"
+                    className={`${pageContainerClassName} ${pageGutterClassName} grid grid-cols-1 items-center gap-20 lg:grid-cols-2`}
                     {...staggerContainer}
                 >
                     <motion.div className="order-2 lg:order-1" {...fadeUpItem}>
@@ -319,7 +320,7 @@ export default function HomePage() {
 
             <motion.section className="relative overflow-hidden py-16 md:py-20 lg:py-24 bg-transparent" {...sectionReveal}>
                 <motion.div
-                    className="max-w-[1920px] mx-auto px-6 md:px-12 lg:px-20 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center"
+                    className={`${pageContainerClassName} ${pageGutterClassName} grid grid-cols-1 items-center gap-20 lg:grid-cols-2`}
                     {...staggerContainer}
                 >
                     <motion.div
@@ -367,11 +368,11 @@ export default function HomePage() {
             </motion.section>
 
             <motion.section
-                className="relative overflow-hidden pt-16 pb-20 md:px-12 md:pt-20 md:pb-24 lg:px-20 lg:pt-24 lg:pb-28 px-6 bg-transparent"
+                className={`relative overflow-hidden ${pageGutterClassName} bg-transparent pb-20 pt-16 md:pb-24 md:pt-20 lg:pb-28 lg:pt-24`}
                 id="panduan"
                 {...sectionReveal}
             >
-                <motion.div className="max-w-[1920px] mx-auto flex flex-col lg:flex-row gap-12" {...staggerContainer}>
+                <motion.div className={`${pageContainerClassName} flex flex-col gap-12 lg:flex-row`} {...staggerContainer}>
                     <motion.div className="lg:w-1/3" {...fadeUpItem}>
                         <div className="lg:sticky lg:top-32 rounded-[2rem] border border-black/5 shadow-[0_20px_55px_rgba(15,23,42,0.1),0_8px_24px_rgba(15,23,42,0.06)] overflow-hidden relative">
                             <div

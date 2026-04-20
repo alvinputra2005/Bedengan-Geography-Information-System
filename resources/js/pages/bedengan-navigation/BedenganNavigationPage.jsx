@@ -11,7 +11,13 @@ import {
     useMap,
 } from 'react-leaflet';
 import { LoaderCircle, LocateFixed, Route, TriangleAlert } from 'lucide-react';
-import { fetchBedengan, fetchBedengans, fetchRoute } from '../../services/bedenganNavigationService';
+import {
+    pageContainerClassName,
+    pageGutterClassName,
+    pageSectionGapClassName,
+    pageShellClassName,
+} from '../../components/layout/pageSpacing';
+import { fetchActiveBedengan, fetchRoute } from '../../services/bedenganNavigationService';
 
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -29,13 +35,6 @@ const bedenganIcon = new L.DivIcon({
     html: '<div style="width:18px;height:18px;border-radius:9999px;background:#026692;border:3px solid #fff;box-shadow:0 8px 18px rgba(2,102,146,0.28);"></div>',
     iconSize: [18, 18],
     iconAnchor: [9, 9],
-});
-
-const selectedBedenganIcon = new L.DivIcon({
-    className: 'custom-bedengan-marker-selected',
-    html: '<div style="width:22px;height:22px;border-radius:9999px;background:#10b981;border:4px solid #fff;box-shadow:0 10px 22px rgba(16,185,129,0.35);"></div>',
-    iconSize: [22, 22],
-    iconAnchor: [11, 11],
 });
 
 const mapCenter = [-7.939644, 112.5310382];
@@ -88,8 +87,17 @@ function formatEta(durationSeconds) {
 
 function MapEffects({ currentLocation, selectedBedengan, routeCoordinates, focusRequestId }) {
     const map = useMap();
+    const manualFocusUntilRef = useRef(0);
+
+    function shouldPauseAutoFit() {
+        return Date.now() < manualFocusUntilRef.current;
+    }
 
     useEffect(() => {
+        if (shouldPauseAutoFit()) {
+            return;
+        }
+
         if (selectedBedengan?.polygon_json?.length) {
             map.fitBounds(selectedBedengan.polygon_json, { padding: [32, 32] });
         } else if (selectedBedengan?.access_lat && selectedBedengan?.access_lng) {
@@ -100,6 +108,10 @@ function MapEffects({ currentLocation, selectedBedengan, routeCoordinates, focus
     }, [map, selectedBedengan]);
 
     useEffect(() => {
+        if (shouldPauseAutoFit()) {
+            return;
+        }
+
         if (routeCoordinates.length > 1) {
             map.fitBounds(routeCoordinates, { padding: [40, 40] });
         }
@@ -110,67 +122,17 @@ function MapEffects({ currentLocation, selectedBedengan, routeCoordinates, focus
             return;
         }
 
+        manualFocusUntilRef.current = Date.now() + 4000;
         map.flyTo([currentLocation.lat, currentLocation.lng], 18, { duration: 0.8 });
     }, [currentLocation, map, focusRequestId]);
 
     return null;
 }
 
-function BedenganList({ bedengans, selectedId, onSelect, loading }) {
-    return (
-        <div className="ambient-shadow rounded-[2rem] border border-black/5 bg-white p-5">
-            <div className="mb-4 flex items-center justify-between gap-3">
-                <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.24em] text-secondary">Daftar Tujuan</p>
-                    <h2 className="mt-2 font-headline text-2xl font-extrabold text-on-surface">Bedengan Aktif</h2>
-                </div>
-                {loading ? <LoaderCircle className="animate-spin text-primary" size={18} /> : null}
-            </div>
-
-            <div className="space-y-3">
-                {bedengans.map((bedengan) => {
-                    const isSelected = bedengan.id === selectedId;
-
-                    return (
-                        <button
-                            key={bedengan.id}
-                            type="button"
-                            onClick={() => onSelect(bedengan.id)}
-                            className={`w-full rounded-[1.5rem] border px-4 py-4 text-left transition-all ${
-                                isSelected
-                                    ? 'border-primary/15 bg-primary/5 shadow-[0_10px_24px_rgba(2,102,146,0.08)]'
-                                    : 'border-black/5 bg-white hover:bg-surface-container-low'
-                            }`}
-                        >
-                            <div className="flex items-start justify-between gap-4">
-                                <div>
-                                    <h3 className={`font-headline text-lg font-bold ${isSelected ? 'text-primary' : 'text-on-surface'}`}>
-                                        {bedengan.name}
-                                    </h3>
-                                    <p className="mt-1 text-sm font-medium leading-relaxed text-on-surface-variant">
-                                        {bedengan.description || 'Gunakan titik akses untuk memulai navigasi menuju area bedengan.'}
-                                    </p>
-                                </div>
-                                <span className={`rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] ${
-                                    isSelected ? 'bg-primary text-white' : 'bg-surface-container-low text-on-surface/60'
-                                }`}>
-                                    {isSelected ? 'Dipilih' : 'Pilih'}
-                                </span>
-                            </div>
-                        </button>
-                    );
-                })}
-            </div>
-        </div>
-    );
-}
-
 export default function BedenganNavigationPage() {
-    const [bedengans, setBedengans] = useState([]);
-    const [selectedBedenganId, setSelectedBedenganId] = useState(null);
     const [selectedBedengan, setSelectedBedengan] = useState(null);
     const [routeData, setRouteData] = useState(null);
-    const [loadingBedengans, setLoadingBedengans] = useState(true);
+    const [loadingBedengan, setLoadingBedengan] = useState(true);
     const [loadingRoute, setLoadingRoute] = useState(false);
     const [pageError, setPageError] = useState('');
     const [routeError, setRouteError] = useState('');
@@ -185,34 +147,34 @@ export default function BedenganNavigationPage() {
     useEffect(() => {
         let isActive = true;
 
-        async function loadBedengans() {
+        async function loadBedengan() {
             try {
-                setLoadingBedengans(true);
-                const response = await fetchBedengans();
+                setLoadingBedengan(true);
+                const bedengan = await fetchActiveBedengan();
                 if (!isActive) {
                     return;
                 }
 
-                const nextBedengans = response.data ?? [];
-                setBedengans(nextBedengans);
-
-                if (nextBedengans[0]) {
-                    setSelectedBedenganId(nextBedengans[0].id);
+                if (!bedengan) {
+                    setPageError('Koordinat Bedengan belum tersedia. Tambahkan satu titik Bedengan aktif terlebih dahulu.');
+                    return;
                 }
+
+                setSelectedBedengan(bedengan);
             } catch (error) {
                 if (!isActive) {
                     return;
                 }
 
-                setPageError(error.response?.data?.message || 'Gagal memuat data bedengan.');
+                setPageError(error.response?.data?.message || 'Gagal memuat koordinat Bedengan.');
             } finally {
                 if (isActive) {
-                    setLoadingBedengans(false);
+                    setLoadingBedengan(false);
                 }
             }
         }
 
-        loadBedengans();
+        loadBedengan();
 
         return () => {
             isActive = false;
@@ -260,37 +222,6 @@ export default function BedenganNavigationPage() {
             }
         };
     }, []);
-
-    useEffect(() => {
-        if (!selectedBedenganId) {
-            return;
-        }
-
-        lastRoutedPositionRef.current = null;
-        setRouteData(null);
-        setRouteError('');
-
-        let isActive = true;
-
-        async function loadSelectedBedengan() {
-            try {
-                const response = await fetchBedengan(selectedBedenganId);
-                if (isActive) {
-                    setSelectedBedengan(response.data);
-                }
-            } catch (error) {
-                if (isActive) {
-                    setPageError(error.response?.data?.message || 'Gagal memuat detail bedengan.');
-                }
-            }
-        }
-
-        loadSelectedBedengan();
-
-        return () => {
-            isActive = false;
-        };
-    }, [selectedBedenganId]);
 
     useEffect(() => {
         if (!selectedBedengan || !currentLocation) {
@@ -347,27 +278,27 @@ export default function BedenganNavigationPage() {
     const selectedPolygon = selectedBedengan?.polygon_json ?? [];
 
     return (
-        <main className="overflow-hidden pb-20 pt-32 md:pt-36">
-            <section className="px-6 md:px-12 lg:px-20">
-                <div className="mx-auto max-w-[1440px]">
+        <main className={pageShellClassName}>
+            <section className={pageGutterClassName}>
+                <div className={pageContainerClassName}>
                     <div className="relative overflow-hidden rounded-[2.5rem] border border-black/5 bg-white/90 p-8 ambient-shadow md:p-12">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(57,184,253,0.14),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(2,102,146,0.08),transparent_38%)]"></div>
                         <div className="relative z-10 max-w-4xl">
                             <p className="text-xs font-bold uppercase tracking-[0.24em] text-secondary">Navigasi Bedengan</p>
                             <h1 className="mt-4 font-headline text-4xl font-extrabold tracking-tight text-on-surface md:text-5xl">
-                                Temukan rute jalan kaki menuju <span className="text-primary">bedengan pilihan</span> secara realtime.
+                                Temukan rute jalan kaki menuju <span className="text-primary">Bedengan</span> secara realtime.
                             </h1>
                             <p className="mt-5 max-w-3xl text-base font-medium leading-relaxed text-on-surface-variant md:text-lg">
-                                Pilih bedengan dari daftar atau langsung dari peta. Sistem akan memantau lokasi Anda secara realtime,
-                                menyorot area bedengan, dan menggambar rute jalan kaki dari posisi saat ini.
+                                Sistem akan memakai koordinat Bedengan yang tersedia, membaca lokasi Anda saat ini, lalu
+                                menghitung rute jalan kaki terbaik secara otomatis melalui OSRM.
                             </p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section className="px-6 pt-12 md:px-12 md:pt-14 lg:px-20 lg:pt-16">
-                <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-8 xl:grid-cols-[23rem_1fr]">
+            <section className={`${pageGutterClassName} ${pageSectionGapClassName}`}>
+                <div className={`${pageContainerClassName} grid grid-cols-1 gap-8 xl:grid-cols-[23rem_1fr]`}>
                     <div className="space-y-6">
                         <div className="ambient-shadow rounded-[2rem] border border-black/5 bg-white p-5">
                             <div>
@@ -393,6 +324,17 @@ export default function BedenganNavigationPage() {
                                         <span>ETA: {formatEta(routeData?.duration_seconds)}</span>
                                     </div>
                                 </div>
+                                <div className="rounded-2xl bg-surface-container-low px-4 py-3">
+                                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-on-surface/50">Tujuan Bedengan</p>
+                                    <p className="mt-2 text-sm font-semibold text-on-surface">
+                                        {selectedBedengan?.name || (loadingBedengan ? 'Memuat titik tujuan...' : 'Belum tersedia')}
+                                    </p>
+                                    <p className="mt-1 text-xs font-medium text-on-surface-variant">
+                                        {selectedBedengan?.access_lat && selectedBedengan?.access_lng
+                                            ? `${selectedBedengan.access_lat}, ${selectedBedengan.access_lng}`
+                                            : 'Koordinat tujuan belum tersedia'}
+                                    </p>
+                                </div>
                             </div>
 
                             {routeError ? (
@@ -401,14 +343,12 @@ export default function BedenganNavigationPage() {
                                     <p>{routeError}</p>
                                 </div>
                             ) : null}
+                            {!routeError && currentLocation && selectedBedengan ? (
+                                <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+                                    Rute OSRM dihitung otomatis dari lokasi Anda menuju titik Bedengan aktif.
+                                </div>
+                            ) : null}
                         </div>
-
-                        <BedenganList
-                            bedengans={bedengans}
-                            selectedId={selectedBedenganId}
-                            onSelect={setSelectedBedenganId}
-                            loading={loadingBedengans}
-                        />
                     </div>
 
                     <div className="ambient-shadow overflow-hidden rounded-[2rem] border border-black/5 bg-white">
@@ -416,21 +356,22 @@ export default function BedenganNavigationPage() {
                             <div>
                                 <p className="text-xs font-bold uppercase tracking-[0.24em] text-secondary">Peta Navigasi</p>
                                 <h2 className="mt-1 font-headline text-2xl font-extrabold text-on-surface">
-                                    {selectedBedengan?.name || 'Pilih bedengan'}
+                                    {selectedBedengan?.name || (loadingBedengan ? 'Memuat Bedengan...' : 'Titik Bedengan')}
                                 </h2>
                             </div>
                             <div className="flex flex-wrap items-center gap-3">
                                 <button
                                     type="button"
                                     onClick={() => setFocusRequestId((value) => value + 1)}
-                                    className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-primary transition-colors hover:bg-primary/10"
+                                    disabled={!currentLocation}
+                                    className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-primary transition-colors hover:bg-primary/10 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <LocateFixed size={14} />
                                     Lihat lokasi saya
                                 </button>
                                 <div className="flex items-center gap-2 text-sm font-semibold text-on-surface-variant">
                                     {loadingRoute ? <LoaderCircle className="animate-spin text-primary" size={16} /> : <Route size={16} className="text-primary" />}
-                                    {loadingRoute ? 'Menghitung rute...' : 'Rute jalan kaki'}
+                                    {loadingRoute ? 'Menghitung rute OSRM...' : 'Rute jalan kaki terbaik'}
                                 </div>
                             </div>
                         </div>
@@ -454,32 +395,14 @@ export default function BedenganNavigationPage() {
                                         focusRequestId={focusRequestId}
                                     />
 
-                                    {bedengans.map((bedengan) => (
+                                    {selectedBedengan?.access_lat && selectedBedengan?.access_lng ? (
                                         <Marker
-                                            key={bedengan.id}
-                                            position={[bedengan.access_lat, bedengan.access_lng]}
-                                            icon={bedengan.id === selectedBedenganId ? selectedBedenganIcon : bedenganIcon}
-                                            eventHandlers={{ click: () => setSelectedBedenganId(bedengan.id) }}
+                                            position={[selectedBedengan.access_lat, selectedBedengan.access_lng]}
+                                            icon={bedenganIcon}
                                         >
-                                            <Tooltip>{bedengan.name}</Tooltip>
+                                            <Tooltip>{selectedBedengan.name}</Tooltip>
                                         </Marker>
-                                    ))}
-
-                                    {bedengans.map((bedengan) =>
-                                        Array.isArray(bedengan.polygon_json) && bedengan.polygon_json.length > 2 ? (
-                                            <Polygon
-                                                key={`${bedengan.id}-polygon`}
-                                                positions={bedengan.polygon_json}
-                                                pathOptions={{
-                                                    color: bedengan.id === selectedBedenganId ? '#10b981' : '#026692',
-                                                    weight: bedengan.id === selectedBedenganId ? 3 : 2,
-                                                    fillColor: bedengan.id === selectedBedenganId ? '#10b981' : '#026692',
-                                                    fillOpacity: bedengan.id === selectedBedenganId ? 0.18 : 0.08,
-                                                }}
-                                                eventHandlers={{ click: () => setSelectedBedenganId(bedengan.id) }}
-                                            />
-                                        ) : null
-                                    )}
+                                    ) : null}
 
                                     {currentLocation ? (
                                         <>
