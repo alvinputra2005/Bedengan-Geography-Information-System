@@ -10,7 +10,6 @@ import {
     fetchAdminCampingGrounds,
     updateCampingGround,
 } from '../../services/campingGroundService';
-import { subscribeToLatestSensor } from '../../services/monitoringService';
 import { FALLBACK_WATER_LEVEL_CM, computeGroundMetrics } from '../../utils/campingGrounds';
 
 const DEFAULT_FORM = {
@@ -25,6 +24,49 @@ const DEFAULT_FORM = {
 };
 
 const ITEMS_PER_PAGE = 6;
+const ADMIN_CAMPING_STORAGE_KEY = 'bedengan.admin.camping.payload';
+const ADMIN_CAMPING_STORAGE_TTL_MS = 60_000;
+
+function readStoredGrounds() {
+    if (typeof window === 'undefined') {
+        return null;
+    }
+
+    try {
+        const rawValue = window.localStorage.getItem(ADMIN_CAMPING_STORAGE_KEY);
+
+        if (!rawValue) {
+            return null;
+        }
+
+        const parsedValue = JSON.parse(rawValue);
+        const cachedAt = Number(parsedValue?.cachedAt ?? 0);
+
+        if (!cachedAt || Date.now() - cachedAt > ADMIN_CAMPING_STORAGE_TTL_MS) {
+            window.localStorage.removeItem(ADMIN_CAMPING_STORAGE_KEY);
+            return null;
+        }
+
+        return Array.isArray(parsedValue.payload) ? parsedValue.payload : null;
+    } catch (error) {
+        window.localStorage.removeItem(ADMIN_CAMPING_STORAGE_KEY);
+        return null;
+    }
+}
+
+function writeStoredGrounds(payload) {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    window.localStorage.setItem(
+        ADMIN_CAMPING_STORAGE_KEY,
+        JSON.stringify({
+            cachedAt: Date.now(),
+            payload,
+        })
+    );
+}
 
 function mapGroundToForm(ground) {
     return {
@@ -40,9 +82,9 @@ function mapGroundToForm(ground) {
 }
 
 export default function AdminCampingPage() {
-    const [grounds, setGrounds] = useState([]);
+    const [grounds, setGrounds] = useState(() => readStoredGrounds() ?? []);
     const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(() => readStoredGrounds() === null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
     const [submitSuccess, setSubmitSuccess] = useState('');
@@ -61,6 +103,7 @@ export default function AdminCampingPage() {
         try {
             const nextGrounds = await fetchAdminCampingGrounds();
             setGrounds(nextGrounds);
+            writeStoredGrounds(nextGrounds);
             setError('');
         } catch (requestError) {
             setError(requestError.response?.data?.message || 'Gagal memuat data camping.');
@@ -74,17 +117,50 @@ export default function AdminCampingPage() {
     }, []);
 
     useEffect(() => {
-        const unsubscribeLatest = subscribeToLatestSensor(
-            (data) => {
-                const nextLevel = Number(data?.jarakCm ?? 0);
-                if (Number.isFinite(nextLevel) && nextLevel > 0) {
-                    setLiveWaterLevelCm(nextLevel);
+        let timeoutId = null;
+        let idleId = null;
+        let unsubscribeLatest = () => {};
+        let isCancelled = false;
+
+        async function subscribeRealtime() {
+            try {
+                const monitoringService = await import('../../services/monitoringService');
+
+                if (isCancelled) {
+                    return;
                 }
-            },
-            () => {}
-        );
+
+                unsubscribeLatest = monitoringService.subscribeToLatestSensor(
+                    (data) => {
+                        const nextLevel = Number(data?.jarakCm ?? 0);
+                        if (Number.isFinite(nextLevel) && nextLevel > 0) {
+                            setLiveWaterLevelCm(nextLevel);
+                        }
+                    },
+                    () => {}
+                );
+            } catch (error) {
+                // Biarkan stat card tetap memakai fallback water level.
+            }
+        }
+
+        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+            idleId = window.requestIdleCallback(subscribeRealtime, { timeout: 1500 });
+        } else {
+            timeoutId = window.setTimeout(subscribeRealtime, 250);
+        }
 
         return () => {
+            isCancelled = true;
+
+            if (timeoutId) {
+                window.clearTimeout(timeoutId);
+            }
+
+            if (idleId && typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
+                window.cancelIdleCallback(idleId);
+            }
+
             unsubscribeLatest();
         };
     }, []);
