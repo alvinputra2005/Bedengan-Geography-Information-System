@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import KPISection from './components/KPISection';
 import MonitoringChart from './components/MonitoringChart';
 import Sidebar from './components/Sidebar';
+import { pageContainerClassName, pageGutterClassName, pageShellClassName } from '../../components/layout/pageSpacing';
 import { getHealthStatus } from '../../services/systemService';
 import { subscribeToLatestSensor } from '../../services/monitoringService';
 
@@ -132,8 +133,8 @@ export default function MonitoringPage() {
     }, [latestSensor, sensorHistory]);
 
     return (
-        <section className="font-sans">
-            <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 lg:flex-row">
+        <main className={`${pageShellClassName} ${pageGutterClassName} font-sans`}>
+            <div className={`${pageContainerClassName} flex flex-col gap-8 lg:flex-row`}>
                 <div className="flex flex-1 flex-col gap-8">
                     <motion.header
                         initial={{ opacity: 0, y: 24 }}
@@ -167,6 +168,6 @@ export default function MonitoringPage() {
 
                 <Sidebar status={status} sensorSummary={sensorSummary} sensorError={sensorError} />
             </div>
-        </section>
+        </main>
     );
 }

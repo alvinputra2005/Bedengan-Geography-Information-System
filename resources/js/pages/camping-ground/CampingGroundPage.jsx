@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Droplets, LayoutGrid, Mountain, TableProperties } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import {
+    pageContainerClassName,
+    pageGutterClassName,
+    pageSectionGapClassName,
+    pageShellClassName,
+} from '../../components/layout/pageSpacing';
 import { subscribeToLatestSensor } from '../../services/monitoringService';
 
 const CAMPING_GROUNDS = [
@@ -318,9 +324,9 @@ export default function CampingGroundPage() {
     }, [currentPage, filteredGrounds]);
 
     return (
-        <main className="overflow-hidden pb-20 pt-28 md:pt-32">
-            <section className="px-6 md:px-12 lg:px-20">
-                <div className="mx-auto max-w-[1440px]">
+        <main className={pageShellClassName}>
+            <section className={pageGutterClassName}>
+                <div className={pageContainerClassName}>
                     <motion.div
                         initial={{ opacity: 0, y: 24 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -357,8 +363,8 @@ export default function CampingGroundPage() {
                 </div>
             </section>
 
-            <section className="px-6 pt-12 md:px-12 md:pt-14 lg:px-20 lg:pt-16">
-                <div className="mx-auto max-w-[1440px]">
+            <section className={`${pageGutterClassName} ${pageSectionGapClassName}`}>
+                <div className={pageContainerClassName}>
                     <section className="w-full">
                         <div className="mb-8 flex flex-col gap-4 rounded-[2rem] border border-black/5 bg-white/75 p-4 backdrop-blur-sm md:flex-row md:items-center md:justify-between">
                             <div className="flex flex-wrap gap-2">
