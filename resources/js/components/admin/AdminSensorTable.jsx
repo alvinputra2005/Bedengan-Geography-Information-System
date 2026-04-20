@@ -16,7 +16,7 @@ function getStatusClasses(status) {
     return 'bg-secondary-container/20 text-primary';
 }
 
-export default function AdminSensorTable({ sensors = [] }) {
+export default function AdminSensorTable({ sensors = [], isLoading = false }) {
     return (
         <section className="flex h-full flex-col rounded-2xl border border-outline-variant/10 bg-surface-container-lowest p-5">
             <div className="mb-5">
@@ -27,7 +27,11 @@ export default function AdminSensorTable({ sensors = [] }) {
             </div>
 
             <div className="flex-1 overflow-x-auto">
-                {sensors.length === 0 ? (
+                {isLoading ? (
+                    <div className="flex h-full min-h-52 items-center justify-center rounded-2xl border border-dashed border-outline-variant/20 bg-surface px-6 text-center text-sm font-medium text-on-surface-variant">
+                        Memuat data sensor terbaru...
+                    </div>
+                ) : sensors.length === 0 ? (
                     <div className="flex h-full min-h-52 items-center justify-center rounded-2xl border border-dashed border-outline-variant/20 bg-surface px-6 text-center text-sm font-medium text-on-surface-variant">
                         Belum ada data sensor yang bisa ditampilkan.
                     </div>

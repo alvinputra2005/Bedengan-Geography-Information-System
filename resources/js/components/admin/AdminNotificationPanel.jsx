@@ -15,7 +15,7 @@ const severityConfig = {
     },
 };
 
-export default function AdminNotificationPanel({ notifications = [] }) {
+export default function AdminNotificationPanel({ notifications = [], isLoading = false }) {
     return (
         <section className="rounded-2xl border border-outline-variant/10 bg-surface-container-lowest p-5">
             <div className="mb-5 flex items-center justify-between">
@@ -29,7 +29,11 @@ export default function AdminNotificationPanel({ notifications = [] }) {
                 </span>
             </div>
 
-            {notifications.length === 0 ? (
+            {isLoading ? (
+                <div className="rounded-2xl border border-dashed border-outline-variant/20 bg-surface px-4 py-6 text-center text-sm font-medium text-on-surface-variant">
+                    Memuat alert operasional...
+                </div>
+            ) : notifications.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-outline-variant/20 bg-surface px-4 py-6 text-center text-sm font-medium text-on-surface-variant">
                     Belum ada alert terbaru.
                 </div>

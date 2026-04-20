@@ -1,14 +1,56 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import AdminHeader from '../../components/admin/AdminHeader';
 import AdminKpiSection from '../../components/admin/AdminKpiSection';
 import AdminMonitoringOverview from '../../components/admin/AdminMonitoringOverview';
 import AdminNotificationPanel from '../../components/admin/AdminNotificationPanel';
-import AdminSensorChart from '../../components/admin/AdminSensorChart';
 import AdminSensorTable from '../../components/admin/AdminSensorTable';
 import { getAdminDashboardData } from '../../services/adminService';
-import { subscribeToLatestSensor, subscribeToSensorHistory } from '../../services/monitoringService';
 
 const MAX_HISTORY_POINTS = 24;
+const DASHBOARD_STORAGE_KEY = 'bedengan.admin.dashboard.payload';
+const DASHBOARD_STORAGE_TTL_MS = 30_000;
+const LazyAdminSensorChart = lazy(() => import('../../components/admin/AdminSensorChart'));
+
+function readStoredDashboardData() {
+    if (typeof window === 'undefined') {
+        return null;
+    }
+
+    try {
+        const rawValue = window.localStorage.getItem(DASHBOARD_STORAGE_KEY);
+
+        if (!rawValue) {
+            return null;
+        }
+
+        const parsedValue = JSON.parse(rawValue);
+        const cachedAt = Number(parsedValue?.cachedAt ?? 0);
+
+        if (!cachedAt || Date.now() - cachedAt > DASHBOARD_STORAGE_TTL_MS) {
+            window.localStorage.removeItem(DASHBOARD_STORAGE_KEY);
+            return null;
+        }
+
+        return parsedValue.payload ?? null;
+    } catch (error) {
+        window.localStorage.removeItem(DASHBOARD_STORAGE_KEY);
+        return null;
+    }
+}
+
+function writeStoredDashboardData(payload) {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    window.localStorage.setItem(
+        DASHBOARD_STORAGE_KEY,
+        JSON.stringify({
+            cachedAt: Date.now(),
+            payload,
+        })
+    );
+}
 
 function normalizeTimestamp(rawTimestamp, fallbackTimestamp = Date.now()) {
     const numericTimestamp = Number(rawTimestamp ?? 0);
@@ -69,9 +111,9 @@ function calculateAverageIncrease(history) {
 }
 
 export default function AdminDashboardPage() {
-    const [data, setData] = useState(null);
+    const [data, setData] = useState(() => readStoredDashboardData());
     const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(() => readStoredDashboardData() === null);
     const [latestSensor, setLatestSensor] = useState(null);
     const [sensorHistory, setSensorHistory] = useState([]);
     const [sensorError, setSensorError] = useState('');
@@ -81,6 +123,7 @@ export default function AdminDashboardPage() {
             try {
                 const response = await getAdminDashboardData();
                 setData(response);
+                writeStoredDashboardData(response);
             } catch (requestError) {
                 setError(requestError.response?.data?.message || 'Gagal memuat dashboard admin.');
             } finally {
@@ -92,23 +135,59 @@ export default function AdminDashboardPage() {
     }, []);
 
     useEffect(() => {
-        const unsubscribeLatest = subscribeToLatestSensor(
-            (payload) => {
-                setLatestSensor(normalizeLatestSensor(payload, Date.now()));
-                setSensorError('');
-            },
-            () => setSensorError('Data sensor live dari Firebase belum bisa dimuat.')
-        );
+        let timeoutId = null;
+        let idleId = null;
+        let unsubscribeLatest = () => {};
+        let unsubscribeHistory = () => {};
+        let isCancelled = false;
 
-        const unsubscribeHistory = subscribeToSensorHistory(
-            (payload) => {
-                setSensorHistory(normalizeHistoryPayload(payload));
-                setSensorError('');
-            },
-            () => setSensorError('Riwayat sensor live belum tersedia.')
-        );
+        async function subscribeRealtime() {
+            try {
+                const monitoringService = await import('../../services/monitoringService');
+
+                if (isCancelled) {
+                    return;
+                }
+
+                unsubscribeLatest = monitoringService.subscribeToLatestSensor(
+                    (payload) => {
+                        setLatestSensor(normalizeLatestSensor(payload, Date.now()));
+                        setSensorError('');
+                    },
+                    () => setSensorError('Data sensor live dari Firebase belum bisa dimuat.')
+                );
+
+                unsubscribeHistory = monitoringService.subscribeToSensorHistory(
+                    (payload) => {
+                        setSensorHistory(normalizeHistoryPayload(payload));
+                        setSensorError('');
+                    },
+                    () => setSensorError('Riwayat sensor live belum tersedia.')
+                );
+            } catch (error) {
+                if (!isCancelled) {
+                    setSensorError('Data sensor live dari Firebase belum bisa dimuat.');
+                }
+            }
+        }
+
+        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+            idleId = window.requestIdleCallback(subscribeRealtime, { timeout: 1500 });
+        } else {
+            timeoutId = window.setTimeout(subscribeRealtime, 250);
+        }
 
         return () => {
+            isCancelled = true;
+
+            if (timeoutId) {
+                window.clearTimeout(timeoutId);
+            }
+
+            if (idleId && typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
+                window.cancelIdleCallback(idleId);
+            }
+
             unsubscribeLatest();
             unsubscribeHistory();
         };
@@ -145,25 +224,39 @@ export default function AdminDashboardPage() {
             />
             {isLoading ? <p className="mb-6 text-sm font-semibold text-on-surface-variant">Memuat ringkasan admin...</p> : null}
             {error ? <p className="mb-6 rounded-2xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{error}</p> : null}
-            {data ? (
-                <>
-                    <AdminKpiSection summary={data.summary} />
 
-                    <div className="mb-6 grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
-                        <AdminMonitoringOverview monitoring={monitoringSummary} sensorError={sensorError} />
-                        <AdminSensorChart history={chartHistory} sensorName={monitoringSummary.sensorName} />
-                    </div>
+            <AdminKpiSection summary={data?.summary} />
 
-                    <div className="grid min-w-0 flex-1 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.85fr)]">
-                        <div className="min-w-0">
-                            <AdminSensorTable sensors={data.sensors} />
-                        </div>
-                        <div className="min-w-0">
-                            <AdminNotificationPanel notifications={data.notifications} />
-                        </div>
-                    </div>
-                </>
-            ) : null}
+            <div className="mb-6 grid min-w-0 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
+                <AdminMonitoringOverview monitoring={monitoringSummary} sensorError={sensorError} />
+                <Suspense
+                    fallback={(
+                        <section className="rounded-2xl border border-outline-variant/10 bg-surface-container-lowest p-5">
+                            <div className="mb-5">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-on-surface-variant">Grafik Sensor</p>
+                                <h2 className="mt-2 font-headline text-xl font-bold text-on-surface">
+                                    {monitoringSummary.sensorName}
+                                </h2>
+                                <p className="mt-1 text-sm text-on-surface-variant">Menyiapkan grafik pembacaan sensor...</p>
+                            </div>
+                            <div className="flex h-[280px] items-center justify-center rounded-2xl border border-dashed border-outline-variant/20 bg-surface px-6 text-center text-sm font-medium text-on-surface-variant">
+                                Grafik sedang dimuat.
+                            </div>
+                        </section>
+                    )}
+                >
+                    <LazyAdminSensorChart history={chartHistory} sensorName={monitoringSummary.sensorName} />
+                </Suspense>
+            </div>
+
+            <div className="grid min-w-0 flex-1 grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.85fr)]">
+                <div className="min-w-0">
+                    <AdminSensorTable sensors={data?.sensors ?? []} isLoading={isLoading && !data} />
+                </div>
+                <div className="min-w-0">
+                    <AdminNotificationPanel notifications={data?.notifications ?? []} isLoading={isLoading && !data} />
+                </div>
+            </div>
         </div>
     );
 }

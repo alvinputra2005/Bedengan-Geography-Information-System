@@ -5,16 +5,34 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
+    protected const DASHBOARD_CACHE_KEY = 'admin_dashboard_payload_v1';
+    protected const DASHBOARD_CACHE_TTL_SECONDS = 30;
+
     public function show(Request $request): JsonResponse
     {
         Carbon::setLocale('id');
 
+        $payload = Cache::remember(
+            self::DASHBOARD_CACHE_KEY,
+            now()->addSeconds(self::DASHBOARD_CACHE_TTL_SECONDS),
+            fn () => $this->buildDashboardPayload()
+        );
+
+        return response()->json([
+            'message' => 'Ringkasan admin berhasil dimuat.',
+            'user' => $request->user()?->load('role:id,name'),
+        ] + $payload);
+    }
+
+    protected function buildDashboardPayload(): array
+    {
         $summary = [
             'registered_users' => DB::table('users')->count(),
             'active_sensors' => DB::table('sensors')->where('status', 'active')->count(),
@@ -39,17 +57,14 @@ class AdminDashboardController extends Controller
             ->first();
 
         $chart = $this->loadChartHistory($latestSensorReading?->sensor_id);
-        $monitoring = $this->buildMonitoringPayload($latestSensorReading, $chart);
 
-        return response()->json([
-            'message' => 'Ringkasan admin berhasil dimuat.',
-            'user' => $request->user()?->load('role:id,name'),
+        return [
             'summary' => $summary,
-            'monitoring' => $monitoring,
+            'monitoring' => $this->buildMonitoringPayload($latestSensorReading, $chart),
             'chart' => $chart->values()->all(),
             'sensors' => $this->loadSensorRows()->all(),
             'notifications' => $this->loadNotifications()->all(),
-        ]);
+        ];
     }
 
     protected function loadChartHistory(?int $sensorId): Collection

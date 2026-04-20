@@ -1,19 +1,39 @@
+import { Suspense, lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import AdminLayout from '../layouts/AdminLayout';
 import AuthLayout from '../layouts/AuthLayout';
 import MainLayout from '../layouts/MainLayout';
-import RegisterPage from '../pages/auth/RegisterPage';
-import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
-import AdminCampingPage from '../pages/admin/AdminCampingPage';
 import AdminPlaceholderPage from '../pages/admin/AdminPlaceholderPage';
-import LoginPage from '../pages/auth/LoginPage';
-import CampingGroundPage from '../pages/camping-ground/CampingGroundPage';
-import HomePage from '../pages/homepage/HomePage';
-import MapPage from '../pages/map/MapPage';
-import MitigationPage from '../pages/mitigation/MitigationPage';
-import MonitoringPage from '../pages/monitoring/MonitoringPage';
-import NotFoundPage from '../pages/system/NotFoundPage';
 import { GuestOnly, RequireAuth } from './guards';
+
+const HomePage = lazy(() => import('../pages/homepage/HomePage'));
+const CampingGroundPage = lazy(() => import('../pages/camping-ground/CampingGroundPage'));
+const MonitoringPage = lazy(() => import('../pages/monitoring/MonitoringPage'));
+const MapPage = lazy(() => import('../pages/map/MapPage'));
+const MitigationPage = lazy(() => import('../pages/mitigation/MitigationPage'));
+const LoginPage = lazy(() => import('../pages/auth/LoginPage'));
+const RegisterPage = lazy(() => import('../pages/auth/RegisterPage'));
+const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage'));
+const AdminCampingPage = lazy(() => import('../pages/admin/AdminCampingPage'));
+const NotFoundPage = lazy(() => import('../pages/system/NotFoundPage'));
+
+function RouteFallback({ message = 'Memuat halaman...' }) {
+    return (
+        <main className="min-h-screen flex items-center justify-center px-6 pt-24">
+            <div className="rounded-3xl border border-black/5 bg-white px-6 py-5 shadow-sm">
+                <p className="text-sm font-semibold text-on-surface-variant">{message}</p>
+            </div>
+        </main>
+    );
+}
+
+function withSuspense(Component, props = {}, message) {
+    return (
+        <Suspense fallback={<RouteFallback message={message} />}>
+            <Component {...props} />
+        </Suspense>
+    );
+}
 
 export const router = createBrowserRouter([
     {
@@ -22,17 +42,17 @@ export const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <HomePage />,
+                element: withSuspense(HomePage, null, 'Memuat beranda...'),
             },
             {
                 path: 'camping-ground',
-                element: <CampingGroundPage />,
+                element: withSuspense(CampingGroundPage, null, 'Memuat area camping...'),
             },
             {
                 path: 'monitoring',
                 element: (
                     <RequireAuth roles={['user', 'admin']}>
-                        <MonitoringPage />
+                        {withSuspense(MonitoringPage, null, 'Memuat monitoring...')}
                     </RequireAuth>
                 ),
             },
@@ -40,7 +60,7 @@ export const router = createBrowserRouter([
                 path: 'map',
                 element: (
                     <RequireAuth roles={['user', 'admin']}>
-                        <MapPage />
+                        {withSuspense(MapPage, null, 'Memuat peta...')}
                     </RequireAuth>
                 ),
             },
@@ -48,7 +68,7 @@ export const router = createBrowserRouter([
                 path: 'mitigation',
                 element: (
                     <RequireAuth roles={['user', 'admin']}>
-                        <MitigationPage />
+                        {withSuspense(MitigationPage, null, 'Memuat mitigasi...')}
                     </RequireAuth>
                 ),
             },
@@ -61,7 +81,7 @@ export const router = createBrowserRouter([
                 path: '/login',
                 element: (
                     <GuestOnly>
-                        <LoginPage />
+                        {withSuspense(LoginPage, null, 'Memuat login...')}
                     </GuestOnly>
                 ),
             },
@@ -69,7 +89,7 @@ export const router = createBrowserRouter([
                 path: '/register',
                 element: (
                     <GuestOnly>
-                        <RegisterPage />
+                        {withSuspense(RegisterPage, null, 'Memuat registrasi...')}
                     </GuestOnly>
                 ),
             },
@@ -85,7 +105,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <AdminDashboardPage />,
+                element: withSuspense(AdminDashboardPage, null, 'Memuat dashboard admin...'),
             },
             {
                 path: 'monitoring',
@@ -99,7 +119,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'camping',
-                element: <AdminCampingPage />,
+                element: withSuspense(AdminCampingPage, null, 'Memuat data camping...'),
             },
             {
                 path: 'map',
@@ -135,6 +155,6 @@ export const router = createBrowserRouter([
     },
     {
         path: '*',
-        element: <NotFoundPage />,
+        element: withSuspense(NotFoundPage, null, 'Memuat halaman...'),
     },
 ]);
