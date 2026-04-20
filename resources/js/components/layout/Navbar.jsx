@@ -71,7 +71,7 @@ export default function Navbar() {
                         className="text-2xl font-extrabold tracking-tighter text-gradient font-headline flex items-center gap-2 flex-shrink-0"
                     >
                         <Trees className="text-primary" size={32} />
-                        <span>Bedengan GIS</span>
+                        <span>Aqualert</span>
                     </Link>
 
                     <div className="hidden lg:flex items-center font-headline font-semibold text-sm tracking-wide bg-surface-container-lowest/30 p-1.5 rounded-full border border-black/5 mx-8">

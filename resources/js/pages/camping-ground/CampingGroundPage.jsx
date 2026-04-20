@@ -7,202 +7,17 @@ import {
     pageSectionGapClassName,
     pageShellClassName,
 } from '../../components/layout/pageSpacing';
+import { fetchCampingGrounds } from '../../services/campingGroundService';
 import { subscribeToLatestSensor } from '../../services/monitoringService';
+import {
+    CAMPING_FILTER_OPTIONS,
+    FALLBACK_WATER_LEVEL_CM,
+    computeGroundMetrics,
+    getRiskStyles,
+    getStatusClass,
+} from '../../utils/campingGrounds';
 
-const CAMPING_GROUNDS = [
-    {
-        id: 'ground-a',
-        name: 'Ground A',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCPpS2lFSB_1ea5OM8mEw-aHWPruRobtPkKS1POeVoeQaXas3GEG5xFk-P8UuwYYB62jWAxGi0HsBLyRaWeKh8Hfw1KVRPT6_V5e7WwynTGHfWKEpQBPwYGiJ4YMt7aeztriptweMJDvTLe5Ea0Y0xJgbcA-gYux3JyYEQIYAbbX91dsCB7rkkJWEVjG_Se_PNRdoctKMlcMwm3CnqAmY5YRC6PRY0KVA9oMJjICMzVIyKolKlg0Re7k9q1qI_-sW4EAe8BiKdZJWE',
-        flatDistanceM: 5,
-        cliffHeightM: 0.5,
-        baseWaterLevelCm: 12,
-    },
-    {
-        id: 'ground-b',
-        name: 'Ground B',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDUTMfufEQOMS_ddT8nIOWC7gKY-EzSh1znxtQ4XVVdWKL4h9_8GTQO-ghpuA0XKSIU-LgCllluuFewjC9zliky9ah8SwX9agQ21VRJP2zjTIoTFSxRgBoB1OpCPdo2_mvKWDBwDK8vGJ2TLHSdzU7o3gC_JgyaFRMZnbB0vNg042QNCaF30SvTzKfLjWU2Annfv6s08Rfu7wHGyL5xRYbJBUameaZ5gLdjQ90aljm-vrhK2l0TcCwoYymrNdgAiq-wzC5b6Cmv79E',
-        flatDistanceM: 3.35,
-        cliffHeightM: 1.6,
-        baseWaterLevelCm: 15,
-    },
-    {
-        id: 'ground-c',
-        name: 'Ground C',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCzUZ3QHNxGT6WyWm_rXy2avf7I2jAxaGFMM7RzAlgqUL258WAo5z3r7RGjyowVqv8lM-0trpBRxL4HzXTfK84qMHYiLRm8HxWWQpt2KSeU0xBj5IwKAj3j8JL-j0xQxZVFT_8XoynIhPKN9Dzn6CWUeo4JREMeAsvxCecjp6EBB61mlkjAPgRxb4HzSUj2q6fXMgTy1HgRggdssK8lMxN9X9mlZJMWzTWuIqRLp3J1K3ltgZ-b7bkQMHpYyvaXpb8zg5Gl5ebc1AM',
-        flatDistanceM: 4.95,
-        cliffHeightM: 2.2,
-        baseWaterLevelCm: 18,
-    },
-    {
-        id: 'ground-d',
-        name: 'Ground D',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCPpS2lFSB_1ea5OM8mEw-aHWPruRobtPkKS1POeVoeQaXas3GEG5xFk-P8UuwYYB62jWAxGi0HsBLyRaWeKh8Hfw1KVRPT6_V5e7WwynTGHfWKEpQBPwYGiJ4YMt7aeztriptweMJDvTLe5Ea0Y0xJgbcA-gYux3JyYEQIYAbbX91dsCB7rkkJWEVjG_Se_PNRdoctKMlcMwm3CnqAmY5YRC6PRY0KVA9oMJjICMzVIyKolKlg0Re7k9q1qI_-sW4EAe8BiKdZJWE',
-        flatDistanceM: 3,
-        cliffHeightM: 1.2,
-        baseWaterLevelCm: 18,
-    },
-    {
-        id: 'ground-e',
-        name: 'Ground E',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCzUZ3QHNxGT6WyWm_rXy2avf7I2jAxaGFMM7RzAlgqUL258WAo5z3r7RGjyowVqv8lM-0trpBRxL4HzXTfK84qMHYiLRm8HxWWQpt2KSeU0xBj5IwKAj3j8JL-j0xQxZVFT_8XoynIhPKN9Dzn6CWUeo4JREMeAsvxCecjp6EBB61mlkjAPgRxb4HzSUj2q6fXMgTy1HgRggdssK8lMxN9X9mlZJMWzTWuIqRLp3J1K3ltgZ-b7bkQMHpYyvaXpb8zg5Gl5ebc1AM',
-        flatDistanceM: 4.7,
-        cliffHeightM: 1.48,
-        baseWaterLevelCm: 18,
-    },
-    {
-        id: 'ground-f',
-        name: 'Ground F',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDUTMfufEQOMS_ddT8nIOWC7gKY-EzSh1znxtQ4XVVdWKL4h9_8GTQO-ghpuA0XKSIU-LgCllluuFewjC9zliky9ah8SwX9agQ21VRJP2zjTIoTFSxRgBoB1OpCPdo2_mvKWDBwDK8vGJ2TLHSdzU7o3gC_JgyaFRMZnbB0vNg042QNCaF30SvTzKfLjWU2Annfv6s08Rfu7wHGyL5xRYbJBUameaZ5gLdjQ90aljm-vrhK2l0TcCwoYymrNdgAiq-wzC5b6Cmv79E',
-        flatDistanceM: 4.53,
-        cliffHeightM: 2.73,
-        baseWaterLevelCm: 21,
-    },
-    {
-        id: 'ground-g',
-        name: 'Ground G',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCPpS2lFSB_1ea5OM8mEw-aHWPruRobtPkKS1POeVoeQaXas3GEG5xFk-P8UuwYYB62jWAxGi0HsBLyRaWeKh8Hfw1KVRPT6_V5e7WwynTGHfWKEpQBPwYGiJ4YMt7aeztriptweMJDvTLe5Ea0Y0xJgbcA-gYux3JyYEQIYAbbX91dsCB7rkkJWEVjG_Se_PNRdoctKMlcMwm3CnqAmY5YRC6PRY0KVA9oMJjICMzVIyKolKlg0Re7k9q1qI_-sW4EAe8BiKdZJWE',
-        flatDistanceM: 6.9,
-        cliffHeightM: 2.4,
-        baseWaterLevelCm: 25,
-    },
-    {
-        id: 'ground-h',
-        name: 'Ground H',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDUTMfufEQOMS_ddT8nIOWC7gKY-EzSh1znxtQ4XVVdWKL4h9_8GTQO-ghpuA0XKSIU-LgCllluuFewjC9zliky9ah8SwX9agQ21VRJP2zjTIoTFSxRgBoB1OpCPdo2_mvKWDBwDK8vGJ2TLHSdzU7o3gC_JgyaFRMZnbB0vNg042QNCaF30SvTzKfLjWU2Annfv6s08Rfu7wHGyL5xRYbJBUameaZ5gLdjQ90aljm-vrhK2l0TcCwoYymrNdgAiq-wzC5b6Cmv79E',
-        flatDistanceM: 3.13,
-        cliffHeightM: 1.09,
-        baseWaterLevelCm: 16,
-    },
-    {
-        id: 'ground-i',
-        name: 'Ground I',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCzUZ3QHNxGT6WyWm_rXy2avf7I2jAxaGFMM7RzAlgqUL258WAo5z3r7RGjyowVqv8lM-0trpBRxL4HzXTfK84qMHYiLRm8HxWWQpt2KSeU0xBj5IwKAj3j8JL-j0xQxZVFT_8XoynIhPKN9Dzn6CWUeo4JREMeAsvxCecjp6EBB61mlkjAPgRxb4HzSUj2q6fXMgTy1HgRggdssK8lMxN9X9mlZJMWzTWuIqRLp3J1K3ltgZ-b7bkQMHpYyvaXpb8zg5Gl5ebc1AM',
-        flatDistanceM: 9.03,
-        cliffHeightM: 3,
-        baseWaterLevelCm: 15,
-    },
-    {
-        id: 'ground-j',
-        name: 'Ground J',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCPpS2lFSB_1ea5OM8mEw-aHWPruRobtPkKS1POeVoeQaXas3GEG5xFk-P8UuwYYB62jWAxGi0HsBLyRaWeKh8Hfw1KVRPT6_V5e7WwynTGHfWKEpQBPwYGiJ4YMt7aeztriptweMJDvTLe5Ea0Y0xJgbcA-gYux3JyYEQIYAbbX91dsCB7rkkJWEVjG_Se_PNRdoctKMlcMwm3CnqAmY5YRC6PRY0KVA9oMJjICMzVIyKolKlg0Re7k9q1qI_-sW4EAe8BiKdZJWE',
-        flatDistanceM: 5.63,
-        cliffHeightM: 2.97,
-        baseWaterLevelCm: 10,
-    },
-    {
-        id: 'ground-k',
-        name: 'Ground K',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCzUZ3QHNxGT6WyWm_rXy2avf7I2jAxaGFMM7RzAlgqUL258WAo5z3r7RGjyowVqv8lM-0trpBRxL4HzXTfK84qMHYiLRm8HxWWQpt2KSeU0xBj5IwKAj3j8JL-j0xQxZVFT_8XoynIhPKN9Dzn6CWUeo4JREMeAsvxCecjp6EBB61mlkjAPgRxb4HzSUj2q6fXMgTy1HgRggdssK8lMxN9X9mlZJMWzTWuIqRLp3J1K3ltgZ-b7bkQMHpYyvaXpb8zg5Gl5ebc1AM',
-        flatDistanceM: 6.54,
-        cliffHeightM: 2.75,
-        baseWaterLevelCm: 16,
-    },
-    {
-        id: 'ground-l',
-        name: 'Ground L',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDUTMfufEQOMS_ddT8nIOWC7gKY-EzSh1znxtQ4XVVdWKL4h9_8GTQO-ghpuA0XKSIU-LgCllluuFewjC9zliky9ah8SwX9agQ21VRJP2zjTIoTFSxRgBoB1OpCPdo2_mvKWDBwDK8vGJ2TLHSdzU7o3gC_JgyaFRMZnbB0vNg042QNCaF30SvTzKfLjWU2Annfv6s08Rfu7wHGyL5xRYbJBUameaZ5gLdjQ90aljm-vrhK2l0TcCwoYymrNdgAiq-wzC5b6Cmv79E',
-        flatDistanceM: 6.64,
-        cliffHeightM: 2.37,
-        baseWaterLevelCm: 11,
-    },
-    {
-        id: 'ground-m',
-        name: 'Ground M',
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCzUZ3QHNxGT6WyWm_rXy2avf7I2jAxaGFMM7RzAlgqUL258WAo5z3r7RGjyowVqv8lM-0trpBRxL4HzXTfK84qMHYiLRm8HxWWQpt2KSeU0xBj5IwKAj3j8JL-j0xQxZVFT_8XoynIhPKN9Dzn6CWUeo4JREMeAsvxCecjp6EBB61mlkjAPgRxb4HzSUj2q6fXMgTy1HgRggdssK8lMxN9X9mlZJMWzTWuIqRLp3J1K3ltgZ-b7bkQMHpYyvaXpb8zg5Gl5ebc1AM',
-        flatDistanceM: 4.62,
-        cliffHeightM: 4.2,
-        baseWaterLevelCm: 40,
-    },
-];
-
-const filterOptions = ['Semua', 'Direkomendasikan', 'Waspada', 'Tidak Direkomendasikan'];
-
-const FALLBACK_WATER_LEVEL_CM = 18;
 const ITEMS_PER_PAGE = 6;
-
-function formatDistance(value) {
-    return `${value.toFixed(2)} m`;
-}
-
-function computeGroundMetrics(ground, liveWaterLevelCm) {
-    const currentWaterLevelCm = liveWaterLevelCm > 0 ? liveWaterLevelCm : ground.baseWaterLevelCm;
-    const waterRiseM = Math.max((currentWaterLevelCm - ground.baseWaterLevelCm) / 100, 0);
-    const effectiveHeightM = Math.max(ground.cliffHeightM - waterRiseM * 0.45, 0);
-    const surfaceDistanceM = Math.sqrt(ground.flatDistanceM ** 2 + effectiveHeightM ** 2);
-    const riskScore = Math.min(
-        92,
-        Math.max(8, Math.round(78 - ground.flatDistanceM * 7 - effectiveHeightM * 11 + waterRiseM * 14))
-    );
-
-    let riskLevel = `Sangat Tinggi (${riskScore}%)`;
-    if (riskScore <= 25) {
-        riskLevel = `Rendah (${riskScore}%)`;
-    } else if (riskScore <= 50) {
-        riskLevel = `Sedang (${riskScore}%)`;
-    } else if (riskScore <= 75) {
-        riskLevel = `Tinggi (${riskScore}%)`;
-    }
-
-    let status = 'Tidak Direkomendasikan';
-    if (riskScore <= 25) {
-        status = 'Direkomendasikan';
-    } else if (riskScore <= 65) {
-        status = 'Waspada';
-    }
-
-    return {
-        ...ground,
-        status,
-        riskScore,
-        riskLevel,
-        currentWaterLevelCm,
-        effectiveHeightM,
-        surfaceDistanceM,
-        displaySurfaceDistance: formatDistance(surfaceDistanceM),
-        displayEffectiveHeight: formatDistance(effectiveHeightM),
-    };
-}
-
-function getStatusClass(status) {
-    if (status === 'Direkomendasikan') {
-        return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
-    }
-
-    if (status === 'Waspada') {
-        return 'bg-yellow-50 text-yellow-800 border border-yellow-200';
-    }
-
-    return 'bg-rose-50 text-rose-800 border border-rose-200';
-}
-
-function getRiskStyles(riskScore) {
-    if (riskScore <= 25) {
-        return {
-            bar: 'bg-emerald-500',
-            text: 'text-emerald-700',
-        };
-    }
-
-    if (riskScore <= 50) {
-        return {
-            bar: 'bg-yellow-500',
-            text: 'text-yellow-700',
-        };
-    }
-
-    if (riskScore <= 75) {
-        return {
-            bar: 'bg-orange-500',
-            text: 'text-orange-700',
-        };
-    }
-
-    return {
-        bar: 'bg-rose-600',
-        text: 'text-rose-700',
-    };
-}
 
 function CampCard({ ground }) {
     const isRecommended = ground.status === 'Direkomendasikan';
@@ -273,10 +88,29 @@ function CampCard({ ground }) {
 }
 
 export default function CampingGroundPage() {
+    const [grounds, setGrounds] = useState([]);
     const [filter, setFilter] = useState('Semua');
     const [viewMode, setViewMode] = useState('grid');
     const [liveWaterLevelCm, setLiveWaterLevelCm] = useState(FALLBACK_WATER_LEVEL_CM);
     const [currentPage, setCurrentPage] = useState(1);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        async function loadGrounds() {
+            try {
+                const nextGrounds = await fetchCampingGrounds();
+                setGrounds(nextGrounds);
+                setError('');
+            } catch (requestError) {
+                setError(requestError.response?.data?.message || 'Data area camping belum bisa dimuat.');
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        loadGrounds();
+    }, []);
 
     useEffect(() => {
         const unsubscribeLatest = subscribeToLatestSensor(
@@ -295,8 +129,8 @@ export default function CampingGroundPage() {
     }, []);
 
     const calculatedGrounds = useMemo(
-        () => CAMPING_GROUNDS.map((ground) => computeGroundMetrics(ground, liveWaterLevelCm)),
-        [liveWaterLevelCm]
+        () => grounds.map((ground) => computeGroundMetrics(ground, liveWaterLevelCm)),
+        [grounds, liveWaterLevelCm]
     );
 
     const recommendedGrounds = useMemo(
@@ -348,7 +182,7 @@ export default function CampingGroundPage() {
                                 <div className="rounded-full border border-black/5 bg-white/90 px-4 py-2 text-sm font-semibold text-on-surface shadow-sm">
                                     <span className="mr-2 text-on-surface-variant">Area dipantau:</span>
                                     <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-primary">
-                                        13 ground
+                                        {grounds.length} ground
                                     </span>
                                 </div>
                                 <div className="rounded-full border border-black/5 bg-white/90 px-4 py-2 text-sm font-semibold text-on-surface shadow-sm">
@@ -366,9 +200,21 @@ export default function CampingGroundPage() {
             <section className={`${pageGutterClassName} ${pageSectionGapClassName}`}>
                 <div className={pageContainerClassName}>
                     <section className="w-full">
+                        {isLoading ? (
+                            <div className="mb-6 rounded-[2rem] border border-black/5 bg-white/75 px-5 py-4 text-sm font-semibold text-on-surface-variant">
+                                Memuat data area camping dari database...
+                            </div>
+                        ) : null}
+
+                        {error ? (
+                            <div className="mb-6 rounded-[2rem] border border-red-100 bg-red-50 px-5 py-4 text-sm font-medium text-red-600">
+                                {error}
+                            </div>
+                        ) : null}
+
                         <div className="mb-8 flex flex-col gap-4 rounded-[2rem] border border-black/5 bg-white/75 p-4 backdrop-blur-sm md:flex-row md:items-center md:justify-between">
                             <div className="flex flex-wrap gap-2">
-                                {filterOptions.map((option) => (
+                                {CAMPING_FILTER_OPTIONS.map((option) => (
                                     <button
                                         key={option}
                                         type="button"
@@ -483,6 +329,14 @@ export default function CampingGroundPage() {
                                                         </td>
                                                     </tr>
                                                 ))}
+
+                                                {filteredGrounds.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan={4} className="px-6 py-12 text-center text-sm font-medium text-on-surface-variant">
+                                                            Tidak ada data ditemukan untuk kategori ini.
+                                                        </td>
+                                                    </tr>
+                                                ) : null}
                                             </tbody>
                                         </table>
                                     </div>

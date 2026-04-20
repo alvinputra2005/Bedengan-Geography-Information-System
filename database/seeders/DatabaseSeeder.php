@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             BedenganSeeder::class,
+            CampingGroundSeeder::class,
             TouristPlaceSeeder::class,
             FloodZoneSeeder::class,
             EvacuationRouteSeeder::class,

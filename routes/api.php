@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AdminDashboardController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BedenganController;
+use App\Http\Controllers\Api\CampingGroundController;
 use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\RouteController;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/health', [HealthController::class, 'show']);
+Route::get('/camping-grounds', [CampingGroundController::class, 'index']);
 
 Route::prefix('auth')->middleware('web')->group(function () {
     Route::post('/login', [AuthController::class, 'store']);

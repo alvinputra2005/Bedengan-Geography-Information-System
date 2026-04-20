@@ -4,6 +4,7 @@ import AuthLayout from '../layouts/AuthLayout';
 import MainLayout from '../layouts/MainLayout';
 import RegisterPage from '../pages/auth/RegisterPage';
 import AdminDashboardPage from '../pages/admin/AdminDashboardPage';
+import AdminCampingPage from '../pages/admin/AdminCampingPage';
 import AdminPlaceholderPage from '../pages/admin/AdminPlaceholderPage';
 import LoginPage from '../pages/auth/LoginPage';
 import CampingGroundPage from '../pages/camping-ground/CampingGroundPage';
@@ -98,13 +99,7 @@ export const router = createBrowserRouter([
             },
             {
                 path: 'camping',
-                element: (
-                    <AdminPlaceholderPage
-                        title="Data Camping"
-                        subtitle="Kelola informasi area camping dan atribut wisata Bedengan."
-                        description="Halaman ini menjadi titik kerja admin untuk memperbarui data lokasi, fasilitas, kapasitas, dan status operasional area camping."
-                    />
-                ),
+                element: <AdminCampingPage />,
             },
             {
                 path: 'map',
